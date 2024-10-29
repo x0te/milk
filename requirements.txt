@@ -1,7 +1,6 @@
 streamlit
 openai
 requests
-json
 uuid
 typing
 time
