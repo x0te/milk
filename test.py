@@ -73,7 +73,7 @@ def typewriter_effect(text: str, speed: float = 0.03):
 
 class SF49StudioAssistant:
     def __init__(self, api_key: str):
-        self.client = OpenAI(api_key=api_key)
+        self.client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
         self.assistant = None
         self.thread = None
         self.webhook_base_url = "https://hook.eu2.make.com"
