@@ -15,46 +15,65 @@ def set_custom_style():
             background: #1A1B1E;
         }
         
-        /* 상단 네비게이션 바 */
+        /* 네비게이션 컨테이너 */
         .nav-container {
-            background: rgba(32, 33, 35, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 1rem 2rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin: 0;
+            position: fixed;
+            top: 4.5rem;  /* Streamlit 헤더 고려 */
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 0.5rem;
+            background: transparent;
+        }
+
+        /* 아이콘 버튼 */
+        .nav-icon {
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
-            gap: 2rem;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            width: 100%;
-            z-index: 1000;
-        }
-        
-        .nav-link {
-            color: rgba(255, 255, 255, 0.85);
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            font-size: 1.2rem;
             text-decoration: none;
+            color: rgba(255, 255, 255, 0.8);
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-icon:hover {
+            background: rgba(255, 75, 75, 0.2);
+            transform: translateY(-2px);
+            border-color: rgba(255, 75, 75, 0.3);
+        }
+
+        /* 툴팁 */
+        .nav-icon::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            right: 50px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
             padding: 0.5rem 1rem;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: rgba(255, 255, 255, 0.05);
-            transition: all 0.2s ease;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
         }
-        
-        .nav-link:hover {
-            background: rgba(255, 75, 75, 0.1);
-            color: #FF4B4B;
-            transform: translateY(-1px);
-        }
-        
-        /* 메인 컨테이너 */
-        .main-content {
-            padding-top: 4rem;
+
+        .nav-icon:hover::after {
+            opacity: 1;
+            visibility: visible;
+            right: 45px;
         }
         
         /* 채팅 인터페이스 */
@@ -130,9 +149,23 @@ def set_custom_style():
             margin-top: 0.5rem;
             font-size: 0.9rem;
         }
+
+        /* Streamlit 기본 요소 조정 */
+        .stDeployButton {
+            display: none;
+        }
+        
+        header[data-testid="stHeader"] {
+            background: rgba(26, 27, 30, 0.9);
+            backdrop-filter: blur(10px);
+        }
+
+        .main > div:first-child {
+            padding-top: 5rem !important;  /* 상단 여백 추가 */
+        }
         </style>
     """, unsafe_allow_html=True)
-
+    
 def typewriter_effect(text: str, speed: float = 0.03):
     """텍스트를 타이핑 효과로 표시"""
     message_placeholder = st.empty()
@@ -387,28 +420,42 @@ def main():
 
     set_custom_style()
 
-    # 상단 네비게이션
+    # 상단 여백
+    st.markdown('<div style="margin-top: 1rem;"></div>', unsafe_allow_html=True)
+
+    # 플로팅 네비게이션
     st.markdown("""
         <div class="nav-container">
-            <a href="https://sf49.studio/" target="_blank" class="nav-link">
-                🏠 SF49 Studio
+            <a href="https://sf49.studio/" 
+               target="_blank" 
+               class="nav-icon"
+               data-tooltip="SF49 Studio">
+                🏠
             </a>
-            <a href="https://sf49.studio/guide" target="_blank" class="nav-link">
-                📖 이용 가이드
+            <a href="https://sf49.studio/guide" 
+               target="_blank" 
+               class="nav-icon"
+               data-tooltip="이용 가이드">
+                📖
             </a>
-            <a href="https://sf49.studio/pricing" target="_blank" class="nav-link">
-                💳 요금제 안내
+            <a href="https://sf49.studio/pricing" 
+               target="_blank" 
+               class="nav-icon"
+               data-tooltip="요금제 안내">
+                💳
             </a>
-            <a href="https://sf49.studio/contact" target="_blank" class="nav-link">
-                ✉️ 문의하기
+            <a href="https://sf49.studio/contact" 
+               target="_blank" 
+               class="nav-icon"
+               data-tooltip="문의하기">
+                ✉️
             </a>
         </div>
-        <div class="main-content">
     """, unsafe_allow_html=True)
 
     st.title("SF49 Studio Designer")
     st.markdown('<p class="header-subtitle">AI 디자인 스튜디오</p>', unsafe_allow_html=True)
-
+    
     # 설명 텍스트 (처음 한번만 타이핑 효과)
     if 'shown_intro' not in st.session_state:
         typewriter_effect("""
@@ -471,8 +518,6 @@ def main():
                 st.session_state.messages.append(message)
             else:
                 typewriter_effect(response["response"], speed=0.02)
-
-    st.markdown("</div>", unsafe_allow_html=True)  # main-content div 닫기
 
 if __name__ == "__main__":
     main()
