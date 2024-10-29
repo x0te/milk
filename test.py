@@ -21,11 +21,14 @@ def set_custom_style():
             backdrop-filter: blur(10px);
             padding: 1rem 2rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin: -6rem -4rem 2rem -4rem;
+            margin: 0;
             display: flex;
             align-items: center;
             gap: 2rem;
             position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
             width: 100%;
             z-index: 1000;
         }
@@ -51,8 +54,7 @@ def set_custom_style():
         
         /* 메인 컨테이너 */
         .main-content {
-            margin-top: 6rem;
-            padding: 2rem;
+            padding-top: 4rem;
         }
         
         /* 채팅 인터페이스 */
