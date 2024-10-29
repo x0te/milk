@@ -10,51 +10,122 @@ import random
 def set_custom_style():
     st.markdown("""
         <style>
-        /* Streamlit 기본 테마 활용 */
+        /* 기본 테마 */
         .stApp {
-            background: transparent;
+            background: #1A1B1E;
         }
         
-        /* 기본 간격 및 여백 조정 */
-        .stImage {
+        /* 상단 네비게이션 바 */
+        .nav-container {
+            background: rgba(32, 33, 35, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin: -6rem -4rem 2rem -4rem;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            transition: all 0.2s ease;
+        }
+        
+        .nav-link:hover {
+            background: rgba(255, 75, 75, 0.1);
+            color: #FF4B4B;
+            transform: translateY(-1px);
+        }
+        
+        /* 메인 컨테이너 */
+        .main-content {
+            margin-top: 6rem;
+            padding: 2rem;
+        }
+        
+        /* 채팅 인터페이스 */
+        .stChatMessage {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
             margin: 1rem 0;
         }
         
-        /* 채팅 메시지 스타일 */
-        .stChatMessage {
-            padding: 1rem;
-            margin: 0.5rem 0;
+        .stChatMessage:hover {
+            border-color: rgba(255, 75, 75, 0.2);
         }
         
-        /* 입력 필드 스타일 */
+        /* 입력 필드 */
         .stTextInput > div > div > input {
-            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.8rem 1rem;
+            border-radius: 6px;
+            color: white;
         }
         
-        /* 이미지 컨테이너 스타일 */
-        .stImage:hover {
-            transform: scale(1.01);
-            transition: transform 0.3s ease;
-        }
-
-        /* 링크 스타일 */
-        .sf49-link {
-            color: inherit;
-            text-decoration: none;
-            padding: 0.5rem 0;
-            display: inline-block;
-            border-bottom: 1px solid transparent;
-            transition: border-color 0.3s ease;
+        .stTextInput > div > div > input:focus {
+            border-color: #FF4B4B;
+            box-shadow: 0 0 0 1px rgba(255, 75, 75, 0.3);
         }
         
-        .sf49-link:hover {
-            border-bottom-color: #FF4B4B;
+        /* 프로그레스 바 */
+        .stProgress > div > div {
+            background: linear-gradient(90deg, #FF4B4B, #FF8F8F) !important;
         }
-
-        /* 캡션 스타일 */
-        .caption-text {
+        
+        .stProgress {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* 캡션과 설명 텍스트 */
+        .header-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .intro-text {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 1rem 0 2rem 0;
+        }
+        
+        /* 이미지 스타일 */
+        .image-container {
+            margin: 1rem 0;
+            transition: all 0.3s ease;
+        }
+        
+        .image-container img {
+            width: 100%;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .image-container:hover {
+            transform: scale(1.02);
+        }
+        
+        .image-caption {
             text-align: center;
-            padding: 0.5rem 0;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 0.5rem;
             font-size: 0.9rem;
         }
         </style>
@@ -171,6 +242,7 @@ class SF49StudioAssistant:
                 "images": [],
                 "message": f"이미지 조회 중 오류가 발생했습니다: {str(e)}"
             }
+
     def process_message(self, user_message: str) -> Dict:
         """사용자 메시지 처리 및 응답 생성"""
         self.client.beta.threads.messages.create(
@@ -250,7 +322,7 @@ class SF49StudioAssistant:
                     
                     my_bar = st.progress(0)
                     
-                    for i in range(100):  # 100초 대기
+                    for i in range(100):
                         if i % 20 == 0:
                             progress_text = random.choice(progress_messages)
                             chat_text = random.choice(chat_messages)
@@ -313,19 +385,28 @@ def main():
 
     set_custom_style()
 
-    # 상단 바로가기 링크
+    # 상단 네비게이션
     st.markdown("""
-        <div style="padding: 0.5rem 0;">
-            <a href="https://sf49.studio/" target="_blank" class="sf49-link">
-                🔗 SF49 바로가기
+        <div class="nav-container">
+            <a href="https://sf49.studio/" target="_blank" class="nav-link">
+                🏠 SF49 Studio
+            </a>
+            <a href="https://sf49.studio/guide" target="_blank" class="nav-link">
+                📖 이용 가이드
+            </a>
+            <a href="https://sf49.studio/pricing" target="_blank" class="nav-link">
+                💳 요금제 안내
+            </a>
+            <a href="https://sf49.studio/contact" target="_blank" class="nav-link">
+                ✉️ 문의하기
             </a>
         </div>
+        <div class="main-content">
     """, unsafe_allow_html=True)
 
-    # 헤더 섹션
     st.title("SF49 Studio Designer")
-    st.caption("AI 디자인 스튜디오")
-    
+    st.markdown('<p class="header-subtitle">AI 디자인 스튜디오</p>', unsafe_allow_html=True)
+
     # 설명 텍스트 (처음 한번만 타이핑 효과)
     if 'shown_intro' not in st.session_state:
         typewriter_effect("""
@@ -335,9 +416,11 @@ def main():
         st.session_state.shown_intro = True
     else:
         st.markdown("""
-        💫 원하시는 이미지를 설명해 주세요
-        🎯 최적의 디자인으로 구현해드립니다
-        """)
+        <div class="intro-text">
+            💫 원하시는 이미지를 설명해 주세요<br>
+            🎯 최적의 디자인으로 구현해드립니다
+        </div>
+        """, unsafe_allow_html=True)
 
     initialize_session_state()
 
@@ -352,11 +435,12 @@ def main():
                     cols = st.columns(2)
                     for idx, url in enumerate(message["image_urls"]):
                         with cols[idx % 2]:
-                            st.image(
-                                url, 
-                                use_column_width=True,
-                                caption=f"Design Option {idx + 1}"
-                            )
+                            st.markdown(f"""
+                                <div class="image-container">
+                                    <img src="{url}">
+                                    <p class="image-caption">Design Option {idx + 1}</p>
+                                </div>
+                            """, unsafe_allow_html=True)
 
     if prompt := st.chat_input("어떤 이미지를 만들어드릴까요?"):
         with st.chat_message("user"):
@@ -375,15 +459,18 @@ def main():
                     cols = st.columns(2)
                     for idx, url in enumerate(response["images"]):
                         with cols[idx % 2]:
-                            st.image(
-                                url, 
-                                use_column_width=True,
-                                caption=f"Design Option {idx + 1}"
-                            )
+                            st.markdown(f"""
+                                <div class="image-container">
+                                    <img src="{url}">
+                                    <p class="image-caption">Design Option {idx + 1}</p>
+                                </div>
+                            """, unsafe_allow_html=True)
                 
                 st.session_state.messages.append(message)
             else:
                 typewriter_effect(response["response"], speed=0.02)
+
+    st.markdown("</div>", unsafe_allow_html=True)  # main-content div 닫기
 
 if __name__ == "__main__":
     main()
