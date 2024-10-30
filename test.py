@@ -448,14 +448,8 @@ class SF49StudioAssistant:
 
 def initialize_session_state():
     """세션 상태 초기화"""
-    if 'assistant' not in st.session_state:
-        api_key = st.secrets["OPENAI_API_KEY"]
-        st.session_state.assistant = SF49StudioAssistant(api_key)
-        st.session_state.assistant.create_assistant()
-    
     if 'messages' not in st.session_state:
         st.session_state.messages = []
-    
     if 'threads' not in st.session_state:
         st.session_state.threads = []
 
@@ -471,67 +465,30 @@ def main():
 
     set_custom_style()
 
-    # 사이드바에 이전 대화 내용 표시
     with st.sidebar:
         st.header("💬 이전 대화 목록")
         for idx, thread in enumerate(st.session_state.threads):
-            if st.button(f"대화 스레드 #{idx + 1}", key=f"thread_{idx}"):
-                st.session_state.messages = thread
+            if st.button(f"대화 스레드 #{idx + 1}: {thread['title']}", key=f"thread_{idx}"):
+                st.session_state.messages = thread['messages']
                 st.experimental_rerun()
 
         if st.button("새로운 대화 시작하기"):
             st.session_state.messages = []
-            st.session_state.threads.append([])
             st.experimental_rerun()
-
-    # 상단 여백
-    st.markdown('<div style="margin-top: 1rem;"></div>', unsafe_allow_html=True)
-
-    # 플로팅 네비게이션
-    st.markdown("""
-        <div class="nav-container">
-            <a href="https://sf49.studio/" 
-               target="_blank" 
-               class="nav-icon"
-               data-tooltip="SF49 Studio">
-                🏠
-            </a>
-            <a href="https://sf49.studio/guide" 
-               target="_blank" 
-               class="nav-icon"
-               data-tooltip="이용 가이드">
-                📖
-            </a>
-            <a href="https://sf49.studio/pricing" 
-               target="_blank" 
-               class="nav-icon"
-               data-tooltip="요금제 안내">
-                💳
-            </a>
-            <a href="https://sf49.studio/contact" 
-               target="_blank" 
-               class="nav-icon"
-               data-tooltip="문의하기">
-                ✉️
-            </a>
-        </div>
-    """, unsafe_allow_html=True)
 
     st.title("SF49 Studio Designer")
     st.markdown('<p class="header-subtitle">AI 디자인 스튜디오</p>', unsafe_allow_html=True)
-    
-    # 설명 텍스트 (항상 말풍선으로 표시)
-    if 'shown_intro' not in st.session_state:
-        with st.chat_message("assistant"):
-            st.markdown("""
-            💫 원하시는 이미지를 설명해 주세요<br>
-            🎯 최적의 디자인으로 구현해드립니다
-            """, unsafe_allow_html=True)
-        st.session_state.shown_intro = True
 
     chat_container = st.container()
     
     with chat_container:
+        if 'shown_intro' not in st.session_state:
+            st.chat_message("assistant").markdown("""
+                💫 원하시는 이미지를 설명해 주세요<br>
+                🎯 최적의 디자인으로 구현해드립니다
+            """, unsafe_allow_html=True)
+            st.session_state.shown_intro = True
+
         for message in st.session_state.messages:
             with st.chat_message(message["role"]):
                 st.markdown(message["content"])
@@ -554,50 +511,16 @@ def main():
                                     <p class="image-caption">Design Option {idx + 1}</p>
                                 </div>
                             """, unsafe_allow_html=True)
-                            
-    if prompt := st.chat_input("어떤 이미지를 만들어드릴까요?"):
-        # 사용자 텍스트는 즉시 표시
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        with st.chat_message("user"):
-            st.markdown(prompt)
 
-        # AI 응답은 타이핑 효과로 표시
-        response = st.session_state.assistant.process_message(prompt)
-        with st.chat_message("assistant"):
-            if response["status"] == "success":
-                typewriter_effect(response["response"], speed=0.02)
-                message = {"role": "assistant", "content": response["response"]}
-                
-                # 이미지 URL이 있으면 해당 URL도 표시
-                if "images" in response and response["images"]:
-                    message["image_urls"] = response["images"]
-                    cols = st.columns(2)
-                    for idx, url in enumerate(response["images"]):
-                        with cols[idx % 2]:
-                            buffer = io.BytesIO()
-                            img = Image.open(requests.get(url, stream=True).raw)
-                            img.save(buffer, format="PNG")
-                            img_base64 = base64.b64encode(buffer.getvalue()).decode()
-                            st.markdown(f"""
-                                <div class="image-container">
-                                    <img src="{url}">
-                                    <div class="overlay-buttons">
-                                        <a href="data:image/png;base64,{img_base64}" download="Design_Option_{idx + 1}.png" class="overlay-button" title="이미지 다운로드">💾</a>
-                                        <a href="{url}" target="_blank" class="overlay-button" title="크게 보기">🔍</a>
-                                    </div>
-                                    <p class="image-caption">Design Option {idx + 1}</p>
-                                </div>
-                            """, unsafe_allow_html=True)
-                
-                st.session_state.messages.append(message)
-            else:
-                typewriter_effect(response["response"], speed=0.02)
-
-        # 새로운 대화 내용이 있으므로 현재 대화 스레드를 업데이트
-        if st.session_state.threads:
-            st.session_state.threads[-1] = list(st.session_state.messages)
-        else:
-            st.session_state.threads.append(list(st.session_state.messages))
+        if prompt := st.chat_input("어떤 이미지를 만들어드릴까요?"):
+            st.session_state.messages.append({"role": "user", "content": prompt})
+            # 새 스레드 제목 설정 및 메시지 추가
+            if not st.session_state.threads or st.session_state.messages == [prompt]:
+                thread_title = f"{prompt[:10]}..." if len(prompt) > 10 else prompt
+                st.session_state.threads.append({
+                    "title": thread_title,
+                    "messages": st.session_state.messages.copy()
+                })
 
 if __name__ == "__main__":
     main()
