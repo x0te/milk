@@ -2,4 +2,3 @@ streamlit
 openai
 requests
 uuid
-streamlit_pages
