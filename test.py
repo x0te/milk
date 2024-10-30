@@ -14,7 +14,8 @@ def set_custom_style():
         <style>
         /* 기본 테마 */
         .stApp {
-            background: #1A1B1E;
+            background: linear-gradient(135deg, #1A1B1E 25%, #2C2F33 75%);
+            color: #EAEAEA;
         }
         
         /* 네비게이션 컨테이너 */
@@ -85,6 +86,7 @@ def set_custom_style():
             border-radius: 8px;
             padding: 1rem;
             margin: 1rem 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
         
         .stChatMessage:hover {
@@ -127,6 +129,7 @@ def set_custom_style():
             border-radius: 8px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             margin: 1rem 0 2rem 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
         
         /* 이미지 스타일 */
@@ -134,6 +137,7 @@ def set_custom_style():
             margin: 1rem 0;
             transition: all 0.3s ease;
             position: relative;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
         
         .image-container img {
@@ -198,6 +202,16 @@ def set_custom_style():
 
         .main > div:first-child {
             padding-top: 5rem !important;  /* 상단 여백 추가 */
+        }
+        
+        /* 사용자 입력 칸에 대한 스타일링 추가 */
+        .stChatInput {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
         </style>
     """, unsafe_allow_html=True)
@@ -551,12 +565,6 @@ def main():
                                     <p class="image-caption">Design Option {idx + 1}</p>
                                 </div>
                             """, unsafe_allow_html=True)
-                            st.download_button(
-                                label=f"Download Design Option {idx + 1}",
-                                data=buffer.getvalue(),
-                                file_name=f"Design_Option_{idx + 1}.png",
-                                mime="image/png"
-                            )
                 
                 st.session_state.messages.append(message)
             else:
