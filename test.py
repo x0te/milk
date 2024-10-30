@@ -6,6 +6,7 @@ from typing import Dict, List, Optional
 import time
 import random
 import io
+import base64
 from PIL import Image
 
 def set_custom_style():
@@ -505,11 +506,12 @@ def main():
                             buffer = io.BytesIO()
                             img = Image.open(requests.get(url, stream=True).raw)
                             img.save(buffer, format="PNG")
+                            img_base64 = base64.b64encode(buffer.getvalue()).decode()
                             st.markdown(f"""
                                 <div class="image-container">
                                     <img src="{url}">
                                     <div class="overlay-buttons">
-                                        <a href="data:image/png;base64,{buffer.getvalue().decode('utf-8')}" download="Design_Option_{idx + 1}.png" class="overlay-button" title="이미지 다운로드">💾</a>
+                                        <a href="data:image/png;base64,{img_base64}" download="Design_Option_{idx + 1}.png" class="overlay-button" title="이미지 다운로드">💾</a>
                                         <a href="{url}" target="_blank" class="overlay-button" title="크게 보기">🔍</a>
                                     </div>
                                     <p class="image-caption">Design Option {idx + 1}</p>
@@ -544,11 +546,12 @@ def main():
                             buffer = io.BytesIO()
                             img = Image.open(requests.get(url, stream=True).raw)
                             img.save(buffer, format="PNG")
+                            img_base64 = base64.b64encode(buffer.getvalue()).decode()
                             st.markdown(f"""
                                 <div class="image-container">
                                     <img src="{url}">
                                     <div class="overlay-buttons">
-                                        <a href="data:image/png;base64,{buffer.getvalue().decode('utf-8')}" download="Design_Option_{idx + 1}.png" class="overlay-button" title="이미지 다운로드">💾</a>
+                                        <a href="data:image/png;base64,{img_base64}" download="Design_Option_{idx + 1}.png" class="overlay-button" title="이미지 다운로드">💾</a>
                                         <a href="{url}" target="_blank" class="overlay-button" title="크게 보기">🔍</a>
                                     </div>
                                     <p class="image-caption">Design Option {idx + 1}</p>
