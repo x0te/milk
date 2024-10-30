@@ -468,7 +468,8 @@ def main():
     with st.sidebar:
         st.header("💬 이전 대화 목록")
         for idx, thread in enumerate(st.session_state.threads):
-            if st.button(f"대화 스레드 #{idx + 1}: {thread['title']}", key=f"thread_{idx}"):
+            thread_title = thread.get('title', 'No Title')
+            if st.button(f"대화 스레드 #{idx + 1}: {thread_title}", key=f"thread_{idx}"):
                 st.session_state.messages = thread['messages']
                 st.experimental_rerun()
 
@@ -516,7 +517,7 @@ def main():
             st.session_state.messages.append({"role": "user", "content": prompt})
             # 새 스레드 제목 설정 및 메시지 추가
             if not st.session_state.threads or st.session_state.messages == [prompt]:
-                thread_title = f"{prompt[:10]}..." if len(prompt) > 10 else prompt
+                thread_title = prompt[:10] + "..." if len(prompt) > 10 else prompt
                 st.session_state.threads.append({
                     "title": thread_title,
                     "messages": st.session_state.messages.copy()
