@@ -515,12 +515,6 @@ def main():
                                     <p class="image-caption">Design Option {idx + 1}</p>
                                 </div>
                             """, unsafe_allow_html=True)
-                            st.download_button(
-                                label=f"Download Design Option {idx + 1}",
-                                data=buffer.getvalue(),
-                                file_name=f"Design_Option_{idx + 1}.png",
-                                mime="image/png"
-                            )
 
     if prompt := st.chat_input("어떤 이미지를 만들어드릴까요?"):
         # 사용자 텍스트는 즉시 표시
@@ -554,12 +548,6 @@ def main():
                                     <p class="image-caption">Design Option {idx + 1}</p>
                                 </div>
                             """, unsafe_allow_html=True)
-                            st.download_button(
-                                label=f"Download Design Option {idx + 1}",
-                                data=buffer.getvalue(),
-                                file_name=f"Design_Option_{idx + 1}.png",
-                                mime="image/png"
-                            )
                 
                 st.session_state.messages.append(message)
             else:
