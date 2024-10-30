@@ -217,19 +217,40 @@ def set_custom_style():
             width: calc(100% - 4rem);
             margin: 0 auto;
         }
+        
+        /* 최근 대화 목록 스타일링 */
+        .recent-conversations {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .recent-conversations h2 {
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 1rem;
+        }
+
+        .recent-conversations p {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 0.5rem;
+        }
         </style>
     """, unsafe_allow_html=True)
 
-def typewriter_effect(text: str, speed: float = 0.03):
+def typewriter_effect(text: str, speed: float = 0.03, placeholder=None):
     """텍스트를 타이핑 효과로 표시"""
-    message_placeholder = st.empty()
+    if placeholder is None:
+        placeholder = st.empty()
     full_text = ""
     for char in text:
         full_text += char
-        message_placeholder.markdown(full_text + "▌")
+        placeholder.markdown(full_text + "▌")
         time.sleep(speed)
-    message_placeholder.markdown(full_text)
-    return message_placeholder
+    placeholder.markdown(full_text)
+    return placeholder
 
 class SF49StudioAssistant:
     def __init__(self, api_key: str):
@@ -399,15 +420,15 @@ class SF49StudioAssistant:
                         "생성된 이미지를 최적화하고 있습니다..."
                     ]
                     
+                    progress_updates = 5  # 로딩 바 업데이트 횟수 줄이기
                     my_bar = st.progress(0)
                     
-                    for i in range(100):
-                        if i % 20 == 0:
-                            progress_text = random.choice(progress_messages)
-                            status_container.markdown(f"**{progress_text}**")
-                        progress_value = (i + 1) / 100
+                    for i in range(progress_updates):
+                        progress_text = random.choice(progress_messages)
+                        status_container.markdown(f"**{progress_text}**")
+                        progress_value = (i + 1) / progress_updates
                         my_bar.progress(progress_value)
-                        time.sleep(1)
+                        time.sleep(2)  # 업데이트 사이 간격을 늘려 사용자 경험 개선
 
                     my_bar.empty()
                     status_container.empty()
@@ -465,86 +486,17 @@ def main():
 
     set_custom_style()
 
-    # 사이드바에 이전 대화 내용 표시
-    with st.sidebar:
-        st.header("💬 이전 대화 목록")
-        for idx, message in enumerate(st.session_state.messages):
-            if message["role"] == "user":
-                st.text(f"사용자: {message['content'][:30]}...")
-            elif message["role"] == "assistant":
-                st.text(f"AI: {message['content'][:30]}...")
-
-    # 상단 여백
-    st.markdown('<div style="margin-top: 1rem;"></div>', unsafe_allow_html=True)
-
-    # 플로팅 네비게이션
+    st.title("SF49 Studio Designer")
     st.markdown("""
-        <div class="nav-container">
-            <a href="https://sf49.studio/" 
-               target="_blank" 
-               class="nav-icon"
-               data-tooltip="SF49 Studio">
-                🏠
-            </a>
-            <a href="https://sf49.studio/guide" 
-               target="_blank" 
-               class="nav-icon"
-               data-tooltip="이용 가이드">
-                📖
-            </a>
-            <a href="https://sf49.studio/pricing" 
-               target="_blank" 
-               class="nav-icon"
-               data-tooltip="요금제 안내">
-                💳
-            </a>
-            <a href="https://sf49.studio/contact" 
-               target="_blank" 
-               class="nav-icon"
-               data-tooltip="문의하기">
-                ✉️
-            </a>
-        </div>
+    <h2 style="font-size: 2rem; color: rgba(255, 255, 255, 0.9); margin-bottom: 1rem;">
+        ✨ Welcome to Your Design Studio
+    </h2>
+    <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: 2rem;">
+        How can we help you today? Please provide us with your design request below.
+    </p>
     """, unsafe_allow_html=True)
 
-    st.title("SF49 Studio Designer")
-    st.markdown('<p class="header-subtitle">AI 디자인 스튜디오</p>', unsafe_allow_html=True)
-    
-    # 설명 텍스트 (항상 말풍선으로 표시)
-    if 'shown_intro' not in st.session_state:
-        with st.chat_message("assistant"):
-            st.markdown("""
-            💫 원하시는 이미지를 설명해 주세요<br>
-            🎯 최적의 디자인으로 구현해드립니다
-            """, unsafe_allow_html=True)
-        st.session_state.shown_intro = True
-
-    chat_container = st.container()
-    
-    with chat_container:
-        for message in st.session_state.messages:
-            with st.chat_message(message["role"]):
-                st.markdown(message["content"])
-                
-                if "image_urls" in message:
-                    cols = st.columns(2)
-                    for idx, url in enumerate(message["image_urls"]):
-                        with cols[idx % 2]:
-                            buffer = io.BytesIO()
-                            img = Image.open(requests.get(url, stream=True).raw)
-                            img.save(buffer, format="PNG")
-                            img_base64 = base64.b64encode(buffer.getvalue()).decode()
-                            st.markdown(f"""
-                                <div class="image-container">
-                                    <img src="{url}">
-                                    <div class="overlay-buttons">
-                                        <a href="data:image/png;base64,{img_base64}" download="Design_Option_{idx + 1}.png" class="overlay-button" title="이미지 다운로드">💾</a>
-                                        <a href="{url}" target="_blank" class="overlay-button" title="크게 보기">🔍</a>
-                                    </div>
-                                    <p class="image-caption">Design Option {idx + 1}</p>
-                                </div>
-                            """, unsafe_allow_html=True)
-                            
+    # 입력 창
     if prompt := st.chat_input("어떤 이미지를 만들어드릴까요?"):
         # 사용자 텍스트는 즉시 표시
         st.session_state.messages.append({"role": "user", "content": prompt})
@@ -553,9 +505,10 @@ def main():
 
         # AI 응답은 타이핑 효과로 표시
         response = st.session_state.assistant.process_message(prompt)
+        placeholder = st.empty()
         with st.chat_message("assistant"):
             if response["status"] == "success":
-                typewriter_effect(response["response"], speed=0.02)
+                typewriter_effect(response["response"], speed=0.02, placeholder=placeholder)
                 message = {"role": "assistant", "content": response["response"]}
                 
                 # 이미지 URL이 있으면 해당 URL도 표시
@@ -581,7 +534,21 @@ def main():
                 
                 st.session_state.messages.append(message)
             else:
-                typewriter_effect(response["response"], speed=0.02)
+                typewriter_effect(response["response"], speed=0.02, placeholder=placeholder)
+
+    # 최근 대화 목록 표시
+    st.markdown("""
+        <div class="recent-conversations">
+            <h2>💬 Recent Conversations</h2>
+    """, unsafe_allow_html=True)
+    
+    for idx, message in enumerate(st.session_state.messages):
+        if message["role"] == "user":
+            st.markdown(f"<p>🗨️ User: {message['content'][:50]}...</p>", unsafe_allow_html=True)
+        elif message["role"] == "assistant":
+            st.markdown(f"<p>🤖 AI: {message['content'][:50]}...</p>", unsafe_allow_html=True)
+
+    st.markdown("</div>", unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
