@@ -453,15 +453,14 @@ def initialize_session_state():
     if 'messages' not in st.session_state:
         st.session_state.messages = []
 
-    if 'sidebar_state' not in st.session_state:
-        st.session_state.sidebar_state = "expanded"
-
 def main():
+    initialize_session_state()
+
     st.set_page_config(
         page_title="SF49 Studio Designer",
         page_icon="🎨",
         layout="wide",
-        initial_sidebar_state=st.session_state.sidebar_state
+        initial_sidebar_state="expanded"
     )
 
     set_custom_style()
@@ -519,8 +518,6 @@ def main():
             🎯 최적의 디자인으로 구현해드립니다
             """, unsafe_allow_html=True)
         st.session_state.shown_intro = True
-
-    initialize_session_state()
 
     chat_container = st.container()
     
