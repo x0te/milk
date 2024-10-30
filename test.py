@@ -13,7 +13,7 @@ def set_custom_style():
         .stApp {
             background: #1A1B1E;
         }
-        
+
         .nav-container {
             position: fixed;
             top: 4.5rem;
@@ -71,50 +71,55 @@ def set_custom_style():
             visibility: visible;
             right: 45px;
         }
-        
+
         .image-wrapper {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
             overflow: hidden;
             margin: 0.5rem 0;
-        }
-
-        .image-caption {
-            padding: 0.8rem;
-            text-align: center;
-            color: rgba(255, 255, 255, 0.7);
-            background: rgba(0, 0, 0, 0.2);
+            position: relative;
         }
 
         .image-controls {
-            display: flex;
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             gap: 0.5rem;
-            justify-content: center;
+            background: rgba(0, 0, 0, 0.6);
             padding: 0.5rem;
-            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+        }
+
+        .image-wrapper:hover .image-controls {
+            display: flex;
         }
 
         .image-control-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
             background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-            padding: 0.3rem 0.8rem;
+            border: none;
+            border-radius: 50%;
+            font-size: 1.5rem;
             color: white;
             cursor: pointer;
             transition: all 0.2s ease;
-            font-size: 0.9rem;
         }
 
         .image-control-button:hover {
             background: rgba(255, 75, 75, 0.2);
-            border-color: rgba(255, 75, 75, 0.3);
         }
 
         .stDeployButton {
             display: none;
         }
-        
+
         header[data-testid="stHeader"] {
             background: rgba(26, 27, 30, 0.9);
             backdrop-filter: blur(10px);
@@ -145,10 +150,9 @@ def display_image_with_controls(image_url: str, caption: str, col):
        st.markdown(f"""
            <div class="image-wrapper">
                <img src="{image_url}" style="width: 100%; display: block;">
-               <div class="image-caption">{caption}</div>
                <div class="image-controls">
-                   <a href="{image_url}" target="_blank" class="image-control-button">확대보기</a>
-                   <a href="{image_url}" download class="image-control-button">다운로드</a>
+                   <button onclick="window.open('{image_url}', '_blank')" class="image-control-button">🔍</button>
+                   <button onclick="window.location.href='{image_url}'" download class="image-control-button">💾</button>
                </div>
            </div>
        """, unsafe_allow_html=True)
@@ -161,7 +165,7 @@ class SF49StudioAssistant:
        self.webhook_base_url = "https://hook.eu2.make.com"
        self.send_webhook = "/l1b22zor5v489mjyc6mgr8ybwliq763v"
        self.retrieve_webhook = "/7qia4xlc2hvxt1qs1yr5eh7g9nqs8brd"
-       
+
    def create_assistant(self):
        self.assistant = self.client.beta.assistants.create(
            name="SF49 Studio Designer",
@@ -206,7 +210,7 @@ class SF49StudioAssistant:
            "imageData": visualization_text,
            "uniqueId": unique_id
        }
-       
+
        try:
            response = requests.post(url, json=payload, timeout=10)
            response.raise_for_status()
@@ -225,12 +229,12 @@ class SF49StudioAssistant:
    def get_image_links(self, unique_id: str) -> Dict:
        url = f"{self.webhook_base_url}{self.retrieve_webhook}"
        payload = {"uniqueId": unique_id}
-       
+
        try:
            response = requests.post(url, json=payload, timeout=10)
            response.raise_for_status()
            result = response.json()
-           
+
            if "images" in result and isinstance(result["images"], list) and len(result["images"]) > 0:
                return {
                    "success": True,
@@ -274,14 +278,14 @@ class SF49StudioAssistant:
                tool_outputs = []
                for tool_call in run.required_action.submit_tool_outputs.tool_calls:
                    args = json.loads(tool_call.function.arguments)
-                   
+
                    if tool_call.function.name == "send_image_request":
                        result = self.send_image_data(
                            args["visualization_text"],
                            args["unique_id"]
                        )
                        generated_id = result["unique_id"]
-                       
+
                        if not result["success"]:
                            return {
                                "status": "error",
@@ -313,9 +317,9 @@ class SF49StudioAssistant:
                        "최종 디테일을 다듬고 있습니다...",
                        "생성된 이미지를 최적화하고 있습니다..."
                    ]
-                   
+
                    my_bar = st.progress(0)
-                   
+
                    for i in range(90):
                        if i % 20 == 0:
                            progress_text = random.choice(progress_messages)
@@ -352,7 +356,7 @@ class SF49StudioAssistant:
                    "status": "error",
                    "response": "처리 중 문제가 발생했습니다. 다시 시도해주세요."
                }
-           
+
            time.sleep(0.5)
 
 def initialize_session_state():
@@ -361,7 +365,7 @@ def initialize_session_state():
        st.session_state.assistant = SF49StudioAssistant(api_key)
        st.session_state.assistant.create_assistant()
        st.session_state.assistant.create_thread()
-   
+
    if 'messages' not in st.session_state:
        st.session_state.messages = []
 
@@ -379,26 +383,26 @@ def main():
 
    st.markdown("""
        <div class="nav-container">
-           <a href="https://sf49.studio/" 
-              target="_blank" 
+           <a href="https://sf49.studio/"
+              target="_blank"
               class="nav-icon"
               data-tooltip="SF49 Studio">
                🏠
            </a>
-           <a href="https://sf49.studio/guide" 
-              target="_blank" 
+           <a href="https://sf49.studio/guide"
+              target="_blank"
               class="nav-icon"
               data-tooltip="이용 가이드">
                📖
            </a>
-           <a href="https://sf49.studio/pricing" 
-              target="_blank" 
+           <a href="https://sf49.studio/pricing"
+              target="_blank"
               class="nav-icon"
               data-tooltip="요금제 안내">
                💳
            </a>
-           <a href="https://sf49.studio/contact" 
-              target="_blank" 
+           <a href="https://sf49.studio/contact"
+              target="_blank"
               class="nav-icon"
               data-tooltip="문의하기">
                ✉️
@@ -408,7 +412,7 @@ def main():
 
    st.title("SF49 Studio Designer")
    st.markdown('<p class="header-subtitle">AI 디자인 스튜디오</p>', unsafe_allow_html=True)
-   
+
    initialize_session_state()
 
    if 'shown_intro' not in st.session_state:
@@ -428,7 +432,7 @@ def main():
    for message in st.session_state.messages:
        with st.chat_message(message["role"]):
            st.write(message["content"])
-           
+
            if "image_urls" in message:
                cols = st.columns(2)
                for idx, url in enumerate(message["image_urls"]):
@@ -441,17 +445,17 @@ def main():
 
        with st.chat_message("assistant"):
            response = st.session_state.assistant.process_message(prompt)
-           
+
            if response["status"] == "success":
                st.write(response["response"])
                message = {"role": "assistant", "content": response["response"]}
-               
+
                if "images" in response and response["images"]:
                    message["image_urls"] = response["images"]
                    cols = st.columns(2)
                    for idx, url in enumerate(response["images"]):
                        display_image_with_controls(url, f"Design Option {idx + 1}", cols[idx % 2])
-               
+
                st.session_state.messages.append(message)
            else:
                st.error(response["response"])
