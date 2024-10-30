@@ -8,7 +8,6 @@ import random
 import io
 import base64
 from PIL import Image
-import streamlit_pages
 
 def set_custom_style():
     st.markdown("""
@@ -520,7 +519,9 @@ def initialize_session_state():
     if 'threads' not in st.session_state:
         st.session_state.threads = []
 
-def home():
+def main():
+    initialize_session_state()
+
     st.set_page_config(
         page_title="SF49 Studio Designer",
         page_icon="🎨",
@@ -529,6 +530,39 @@ def home():
     )
 
     set_custom_style()
+
+    # 상단 여백
+    st.markdown('<div style="margin-top: 1rem;"></div>', unsafe_allow_html=True)
+
+    # 플로팅 네비게이션
+    st.markdown("""
+        <div class="nav-container">
+            <a href="https://sf49.studio/" 
+               target="_blank" 
+               class="nav-icon"
+               data-tooltip="SF49 Studio">
+                🏠
+            </a>
+            <a href="https://sf49.studio/guide" 
+               target="_blank" 
+               class="nav-icon"
+               data-tooltip="이용 가이드">
+                📖
+            </a>
+            <a href="https://sf49.studio/pricing" 
+               target="_blank" 
+               class="nav-icon"
+               data-tooltip="요금제 안내">
+                💳
+            </a>
+            <a href="https://sf49.studio/contact" 
+               target="_blank" 
+               class="nav-icon"
+               data-tooltip="문의하기">
+                ✉️
+            </a>
+        </div>
+    """, unsafe_allow_html=True)
 
     st.title("SF49 Studio Designer")
     st.markdown('<p class="header-subtitle">AI 디자인 스튜디오</p>', unsafe_allow_html=True)
@@ -605,31 +639,6 @@ def home():
                 st.session_state.messages.append(message)
             else:
                 typewriter_effect(response["response"], speed=0.02)
-
-        # 새로운 대화 내용이 있으므로 현재 대화 스레드를 업데이트
-        if st.session_state.threads:
-            st.session_state.threads[-1] = list(st.session_state.messages)
-        else:
-            thread_title = f"대화 스레드 #{len(st.session_state.threads) + 1} - {prompt[:15]}..."
-            st.session_state.threads.append({"title": thread_title, "messages": list(st.session_state.messages)})
-
-def thread_view():
-    st.sidebar.title("💬 이전 대화 목록")
-    if st.session_state.threads:
-        for idx, thread in enumerate(st.session_state.threads):
-            if st.sidebar.button(thread["title"], key=f"thread_{idx}"):
-                st.session_state.messages = thread["messages"]
-                st.experimental_rerun()
-    else:
-        st.sidebar.write("저장된 대화가 없습니다.")
-
-def main():
-    initialize_session_state()
-
-    app = MultiPage()
-    app.add_page("Home", home)
-    app.add_page("Thread View", thread_view)
-    app.run()
 
 if __name__ == "__main__":
     main()
