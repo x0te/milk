@@ -327,7 +327,6 @@ class SF49StudioAssistant:
 
         generated_id = None
         status_container = st.empty()
-        message_container = st.empty()
 
         while True:
             run = self.client.beta.threads.runs.retrieve(
@@ -380,28 +379,18 @@ class SF49StudioAssistant:
                         "생성된 이미지를 최적화하고 있습니다..."
                     ]
                     
-                    chat_messages = [
-                        "디자인 작업이 순조롭게 진행되고 있습니다.",
-                        "각 요소를 세심하게 조정하고 있습니다.",
-                        "고품질의 결과물을 만들어내고 있습니다.",
-                        "디자인의 완성도를 높이고 있습니다.",
-                        "곧 멋진 결과물을 보여드릴 수 있을 것 같습니다.",
-                        "마지막 단계에 진입했습니다."
-                    ]
-                    
                     my_bar = st.progress(0)
                     
                     for i in range(100):
                         if i % 20 == 0:
                             progress_text = random.choice(progress_messages)
-                            chat_text = random.choice(chat_messages)
-                            message_container = typewriter_effect(chat_text, speed=0.02)
+                            status_container.markdown(f"**{progress_text}**")
                         progress_value = (i + 1) / 100
-                        my_bar.progress(progress_value, text=progress_text)
+                        my_bar.progress(progress_value)
                         time.sleep(1)
 
                     my_bar.empty()
-                    message_container.empty()
+                    status_container.empty()
 
                     result = self.get_image_links(generated_id)
                     if result["success"] and result["images"]:
@@ -490,20 +479,14 @@ def main():
     st.title("SF49 Studio Designer")
     st.markdown('<p class="header-subtitle">AI 디자인 스튜디오</p>', unsafe_allow_html=True)
     
-    # 설명 텍스트 (처음 한번만 타이핑 효과)
+    # 설명 텍스트 (항상 말풍선으로 표시)
     if 'shown_intro' not in st.session_state:
-        typewriter_effect("""
-        💫 원하시는 이미지를 설명해 주세요
-        🎯 최적의 디자인으로 구현해드립니다
-        """, speed=0.02)
-        st.session_state.shown_intro = True
-    else:
-        st.markdown("""
-        <div class="intro-text">
+        with st.chat_message("assistant"):
+            st.markdown("""
             💫 원하시는 이미지를 설명해 주세요<br>
             🎯 최적의 디자인으로 구현해드립니다
-        </div>
-        """, unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
+        st.session_state.shown_intro = True
 
     initialize_session_state()
 
@@ -522,7 +505,7 @@ def main():
                                 <div class="image-container">
                                     <img src="{url}">
                                     <div class="overlay-buttons">
-                                        <a href="{url}" download="Design_Option_{idx + 1}.png" class="overlay-button" title="이미지 다운로드">💾</a>
+                                        <a href="{url}" download class="overlay-button" title="이미지 다운로드">💾</a>
                                         <a href="{url}" target="_blank" class="overlay-button" title="크게 보기">🔍</a>
                                     </div>
                                     <p class="image-caption">Design Option {idx + 1}</p>
