@@ -2,7 +2,6 @@ import streamlit as st
 from openai import OpenAI
 import requests
 import json
-import uuid
 from typing import Dict, List, Optional
 import time
 import random
@@ -105,7 +104,7 @@ def set_custom_style():
         
         /* 프로그레스 바 */
         .stProgress > div > div {
-            background: linear-gradient(90deg, #FF4B4B, #FF8F8F) !important;
+            background: linear-gradient(90deg, #1DB954, #1ED760) !important;
         }
         
         .stProgress {
@@ -505,7 +504,7 @@ def main():
                                 <div class="image-container">
                                     <img src="{url}">
                                     <div class="overlay-buttons">
-                                        <a href="{url}" download class="overlay-button" title="이미지 다운로드">💾</a>
+                                        <a href="{url}" download="Design_Option_{idx + 1}" class="overlay-button" title="이미지 다운로드">💾</a>
                                         <a href="{url}" target="_blank" class="overlay-button" title="크게 보기">🔍</a>
                                     </div>
                                     <p class="image-caption">Design Option {idx + 1}</p>
@@ -514,13 +513,13 @@ def main():
 
     if prompt := st.chat_input("어떤 이미지를 만들어드릴까요?"):
         # 사용자 텍스트는 즉시 표시
+        st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
             st.markdown(prompt)
-        st.session_state.messages.append({"role": "user", "content": prompt})
 
         # AI 응답은 타이핑 효과로 표시
+        response = st.session_state.assistant.process_message(prompt)
         with st.chat_message("assistant"):
-            response = st.session_state.assistant.process_message(prompt)
             if response["status"] == "success":
                 typewriter_effect(response["response"], speed=0.02)
                 message = {"role": "assistant", "content": response["response"]}
@@ -535,7 +534,7 @@ def main():
                                 <div class="image-container">
                                     <img src="{url}">
                                     <div class="overlay-buttons">
-                                        <a href="{url}" download="Design_Option_{idx + 1}.png" class="overlay-button" title="이미지 다운로드">💾</a>
+                                        <a href="{url}" download class="overlay-button" title="이미지 다운로드">💾</a>
                                         <a href="{url}" target="_blank" class="overlay-button" title="크게 보기">🔍</a>
                                     </div>
                                     <p class="image-caption">Design Option {idx + 1}</p>
