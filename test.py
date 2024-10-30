@@ -13,7 +13,6 @@ def set_custom_style():
         .stApp {
             background: #1A1B1E;
         }
-
         .nav-container {
             position: fixed;
             top: 4.5rem;
@@ -23,7 +22,6 @@ def set_custom_style():
             gap: 0.5rem;
             background: transparent;
         }
-
         .nav-icon {
             width: 40px;
             height: 40px;
@@ -41,13 +39,11 @@ def set_custom_style():
             position: relative;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-
         .nav-icon:hover {
             background: rgba(255, 75, 75, 0.2);
             transform: translateY(-2px);
             border-color: rgba(255, 75, 75, 0.3);
         }
-
         .nav-icon::after {
             content: attr(data-tooltip);
             position: absolute;
@@ -65,13 +61,11 @@ def set_custom_style():
             transition: all 0.3s ease;
             backdrop-filter: blur(10px);
         }
-
         .nav-icon:hover::after {
             opacity: 1;
             visibility: visible;
             right: 45px;
         }
-
         .image-wrapper {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -80,7 +74,6 @@ def set_custom_style():
             margin: 0.5rem 0;
             position: relative;
         }
-
         .image-controls {
             display: none;
             position: absolute;
@@ -92,11 +85,9 @@ def set_custom_style():
             padding: 0.5rem;
             border-radius: 12px;
         }
-
         .image-wrapper:hover .image-controls {
             display: flex;
         }
-
         .image-control-button {
             display: flex;
             align-items: center;
@@ -111,36 +102,47 @@ def set_custom_style():
             cursor: pointer;
             transition: all 0.2s ease;
         }
-
         .image-control-button:hover {
             background: rgba(255, 75, 75, 0.2);
         }
-
         .stDeployButton {
             display: none;
         }
-
         header[data-testid="stHeader"] {
             background: rgba(26, 27, 30, 0.9);
             backdrop-filter: blur(10px);
         }
-
         .main > div:first-child {
             padding-top: 5rem !important;
         }
-
         .header-subtitle {
             color: rgba(255, 255, 255, 0.7);
             font-size: 1.1rem;
             margin-bottom: 2rem;
         }
-
         .intro-text {
             background: rgba(255, 255, 255, 0.05);
             padding: 1.5rem;
             border-radius: 8px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             margin: 1rem 0 2rem 0;
+        }
+        .chat-message {
+            position: relative;
+            padding: 10px;
+            border-radius: 25px;
+            background: #fff;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+        .chat-message.user-message {
+            margin-left: 20px;
+            background: #f1f1f1;
+        }
+        .chat-message.ai-message {
+            margin-right: 20px;
+            background: #e1f5fe;
         }
         </style>
     """, unsafe_allow_html=True)
@@ -430,8 +432,13 @@ def main():
        """, unsafe_allow_html=True)
 
    for message in st.session_state.messages:
-       with st.chat_message(message["role"]):
-           st.write(message["content"])
+       with st.container():
+           role = "user-message" if message["role"] == "user" else "ai-message"
+           message_container = st.empty()
+           for i in range(len(message["content"])):
+               message_container.markdown(f"<div class='chat-message {role}'>{message['content'][:i+1]}</div>", unsafe_allow_html=True)
+               time.sleep(0.05)
+           message_container.markdown(f"<div class='chat-message {role}'>{message['content']}</div>", unsafe_allow_html=True)
 
            if "image_urls" in message:
                cols = st.columns(2)
@@ -439,26 +446,22 @@ def main():
                    display_image_with_controls(url, f"Design Option {idx + 1}", cols[idx % 2])
 
    if prompt := st.chat_input("어떤 이미지를 만들어드릴까요?"):
-       with st.chat_message("user"):
-           st.write(prompt)
-       st.session_state.messages.append({"role": "user", "content": prompt})
+       with st.container():
+           st.session_state.messages.append({"role": "user", "content": prompt})
 
-       with st.chat_message("assistant"):
-           response = st.session_state.assistant.process_message(prompt)
+           with st.container():
+               response = st.session_state.assistant.process_message(prompt)
 
-           if response["status"] == "success":
-               st.write(response["response"])
-               message = {"role": "assistant", "content": response["response"]}
+               if response["status"] == "success":
+                   st.session_state.messages.append({"role": "assistant", "content": response["response"]})
 
-               if "images" in response and response["images"]:
-                   message["image_urls"] = response["images"]
-                   cols = st.columns(2)
-                   for idx, url in enumerate(response["images"]):
-                       display_image_with_controls(url, f"Design Option {idx + 1}", cols[idx % 2])
+                   if "images" in response and response["images"]:
+                       cols = st.columns(2)
+                       for idx, url in enumerate(response["images"]):
+                           display_image_with_controls(url, f"Design Option {idx + 1}", cols[idx % 2])
 
-               st.session_state.messages.append(message)
-           else:
-               st.error(response["response"])
+               else:
+                   st.error(response["response"])
 
 if __name__ == "__main__":
    main()
