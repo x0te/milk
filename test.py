@@ -207,17 +207,6 @@ def set_custom_style():
             padding-top: 5rem !important;  /* 상단 여백 추가 */
         }
         
-        /* 사용자 입력 칸에 대한 스타일링 추가 */
-        .stChatInput {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 1rem;
-            border-radius: 10px;
-            margin-bottom: 1rem;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            width: calc(100% - 4rem);
-            margin: 0 auto;
-        }
         </style>
     """, unsafe_allow_html=True)
 
