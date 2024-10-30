@@ -594,7 +594,10 @@ def main():
                 typewriter_effect(response["response"], speed=0.02)
 
         # 새로운 대화 내용이 있으므로 현재 대화 스레드를 업데이트
-        st.session_state.threads[-1] = st.session_state.messages
+        if st.session_state.threads:
+            st.session_state.threads[-1] = list(st.session_state.messages)
+        else:
+            st.session_state.threads.append(list(st.session_state.messages))
 
 if __name__ == "__main__":
     main()
