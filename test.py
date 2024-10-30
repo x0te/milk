@@ -1,4 +1,4 @@
-import streamlit as st
+import streamlit as st 
 from openai import OpenAI
 import requests
 import json
@@ -231,6 +231,47 @@ def typewriter_effect(text: str, speed: float = 0.03):
     message_placeholder.markdown(full_text)
     return message_placeholder
 
+def confetti_effect():
+    """스트림릿에서 confetti 효과를 표시"""
+    st.markdown("""
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    <script>
+    const duration = 5 * 1000;
+    const end = Date.now() + duration;
+
+    (function frame() {
+      confetti({
+        particleCount: 3,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0 }
+      });
+      confetti({
+        particleCount: 3,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1 }
+      });
+
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
+      }
+    }());
+    </script>
+    """, unsafe_allow_html=True)
+
+def glowing_text_effect(text: str):
+    """글로잉 텍스트 효과 표시"""
+    st.markdown(f"""
+    <p style="
+        font-size: 1.5rem;
+        font-weight: bold;
+        text-align: center;
+        color: #FFF;
+        text-shadow: 0 0 5px #FF0000, 0 0 10px #FF0000, 0 0 15px #FF0000;
+    ">{text}</p>
+    """, unsafe_allow_html=True)
+
 class SF49StudioAssistant:
     def __init__(self, api_key: str):
         self.client = OpenAI(api_key=st.secrets["openai_api_key"])
@@ -418,6 +459,8 @@ class SF49StudioAssistant:
                     result = self.get_image_links(generated_id)
                     if result["success"] and result["images"]:
                         st.balloons()
+                        confetti_effect()
+                        glowing_text_effect("✨ 디자인이 완성되었습니다! 마음에 드시는 결과물이 있으신가요?")
                         return {
                             "status": "success",
                             "response": "✨ 디자인이 완성되었습니다! 마음에 드시는 결과물이 있으신가요?",
@@ -470,19 +513,6 @@ def main():
     )
 
     set_custom_style()
-
-    # 사이드바에 이전 대화 내용 표시
-    with st.sidebar:
-        st.header("💬 이전 대화 목록")
-        for idx, thread in enumerate(st.session_state.threads):
-            if st.button(f"대화 스레드 #{idx + 1}", key=f"thread_{idx}"):
-                st.session_state.messages = thread
-                st.experimental_rerun()
-
-        if st.button("새로운 대화 시작하기"):
-            st.session_state.messages = []
-            st.session_state.threads.append([])
-            st.experimental_rerun()
 
     # 상단 여백
     st.markdown('<div style="margin-top: 1rem;"></div>', unsafe_allow_html=True)
@@ -592,12 +622,6 @@ def main():
                 st.session_state.messages.append(message)
             else:
                 typewriter_effect(response["response"], speed=0.02)
-
-        # 새로운 대화 내용이 있으므로 현재 대화 스레드를 업데이트
-        if st.session_state.threads:
-            st.session_state.threads[-1] = list(st.session_state.messages)
-        else:
-            st.session_state.threads.append(list(st.session_state.messages))
 
 if __name__ == "__main__":
     main()
