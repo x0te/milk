@@ -131,6 +131,7 @@ def set_custom_style():
         .image-container {
             margin: 1rem 0;
             transition: all 0.3s ease;
+            position: relative;
         }
         
         .image-container img {
@@ -148,6 +149,39 @@ def set_custom_style():
             color: rgba(255, 255, 255, 0.7);
             margin-top: 0.5rem;
             font-size: 0.9rem;
+        }
+
+        /* 이미지 오버레이 버튼 */
+        .image-container .overlay-buttons {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 0.5rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .image-container:hover .overlay-buttons {
+            opacity: 1;
+        }
+
+        .overlay-button {
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
+        }
+
+        .overlay-button:hover {
+            background: rgba(255, 75, 75, 0.8);
         }
 
         /* Streamlit 기본 요소 조정 */
@@ -487,6 +521,10 @@ def main():
                             st.markdown(f"""
                                 <div class="image-container">
                                     <img src="{url}">
+                                    <div class="overlay-buttons">
+                                        <a href="{url}" download="Design_Option_{idx + 1}.png" class="overlay-button" title="이미지 다운로드">💾</a>
+                                        <a href="{url}" target="_blank" class="overlay-button" title="크게 보기">🔍</a>
+                                    </div>
                                     <p class="image-caption">Design Option {idx + 1}</p>
                                 </div>
                             """, unsafe_allow_html=True)
@@ -513,6 +551,10 @@ def main():
                             st.markdown(f"""
                                 <div class="image-container">
                                     <img src="{url}">
+                                    <div class="overlay-buttons">
+                                        <a href="{url}" download="Design_Option_{idx + 1}.png" class="overlay-button" title="이미지 다운로드">💾</a>
+                                        <a href="{url}" target="_blank" class="overlay-button" title="크게 보기">🔍</a>
+                                    </div>
                                     <p class="image-caption">Design Option {idx + 1}</p>
                                 </div>
                             """, unsafe_allow_html=True)
