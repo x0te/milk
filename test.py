@@ -470,10 +470,42 @@ def main():
         st.header("💬 이전 대화 목록")
         for idx, message in enumerate(st.session_state.messages):
             if message["role"] == "user":
-                st.text(f"사용자: {message['content'][:30]}...")
+                if st.button(f"사용자: {message['content'][:30]}...", key=f"user_{idx}"):
+                    st.experimental_set_query_params(thread=idx)
+                    st.experimental_rerun()
             elif message["role"] == "assistant":
-                st.text(f"AI: {message['content'][:30]}...")
+                if st.button(f"AI: {message['content'][:30]}...", key=f"ai_{idx}"):
+                    st.experimental_set_query_params(thread=idx)
+                    st.experimental_rerun()
 
+    # 현재 선택된 대화 스레드 표시
+    query_params = st.experimental_get_query_params()
+    selected_thread = query_params.get("thread")
+    if selected_thread:
+        selected_thread = int(selected_thread[0])
+        with st.expander(f"💬 대화 스레드 #{selected_thread + 1}", expanded=True):
+            for message in st.session_state.messages[selected_thread:]:
+                with st.chat_message(message["role"]):
+                    st.markdown(message["content"])
+                if "image_urls" in message:
+                    cols = st.columns(2)
+                    for idx, url in enumerate(message["image_urls"]):
+                        with cols[idx % 2]:
+                            buffer = io.BytesIO()
+                            img = Image.open(requests.get(url, stream=True).raw)
+                            img.save(buffer, format="PNG")
+                            img_base64 = base64.b64encode(buffer.getvalue()).decode()
+                            st.markdown(f"""
+                                <div class="image-container">
+                                    <img src="{url}">
+                                    <div class="overlay-buttons">
+                                        <a href="data:image/png;base64,{img_base64}" download="Design_Option_{idx + 1}.png" class="overlay-button" title="이미지 다운로드">💾</a>
+                                        <a href="{url}" target="_blank" class="overlay-button" title="크게 보기">🔍</a>
+                                    </div>
+                                    <p class="image-caption">Design Option {idx + 1}</p>
+                                </div>
+                            """, unsafe_allow_html=True)
+    
     # 상단 여백
     st.markdown('<div style="margin-top: 1rem;"></div>', unsafe_allow_html=True)
 
