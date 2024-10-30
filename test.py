@@ -6,6 +6,7 @@ import uuid
 from typing import Dict, List, Optional
 import time
 import random
+from datetime import datetime
 
 def set_custom_style():
     st.markdown("""
@@ -18,7 +19,7 @@ def set_custom_style():
         /* 네비게이션 컨테이너 */
         .nav-container {
             position: fixed;
-            top: 4.5rem;  /* Streamlit 헤더 고려 */
+            top: 4.5rem;
             right: 20px;
             z-index: 1000;
             display: flex;
@@ -76,17 +77,40 @@ def set_custom_style():
             right: 45px;
         }
         
-        /* 채팅 인터페이스 */
+        /* 채팅 메시지 기본 스타일 */
         .stChatMessage {
-            background: rgba(255, 255, 255, 0.05) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            padding: 1rem;
-            margin: 1rem 0;
+            position: relative;
+            background: transparent !important;
+            border: none !important;
+            padding: 1rem !important;
+            margin: 1rem 0 !important;
         }
-        
-        .stChatMessage:hover {
-            border-color: rgba(255, 75, 75, 0.2);
+
+        /* 메시지 말풍선 스타일 */
+        .message-bubble {
+            position: relative;
+            padding: 1rem 1.2rem;
+            border-radius: 15px;
+            max-width: 80%;
+            width: fit-content;
+            margin-bottom: 0.5rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* 사용자 메시지 */
+        .stChatMessage[data-testid="chat-message-user"] .message-bubble {
+            margin-left: auto;
+            background: linear-gradient(135deg, #FF4B4B 0%, #FF7676 100%);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        /* 어시스턴트 메시지 */
+        .stChatMessage[data-testid="chat-message-assistant"] .message-bubble {
+            margin-right: auto;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom-left-radius: 5px;
         }
         
         /* 입력 필드 */
@@ -94,8 +118,9 @@ def set_custom_style():
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
             padding: 0.8rem 1rem;
-            border-radius: 6px;
+            border-radius: 24px;
             color: white;
+            font-size: 0.95rem;
         }
         
         .stTextInput > div > div > input:focus {
@@ -127,27 +152,65 @@ def set_custom_style():
             margin: 1rem 0 2rem 0;
         }
         
-        /* 이미지 스타일 */
-        .image-container {
-            margin: 1rem 0;
-            transition: all 0.3s ease;
+        /* 이미지 그리드 */
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
         }
         
-        .image-container img {
-            width: 100%;
-            border-radius: 8px;
+        /* 이미지 컨테이너 */
+        .image-container {
+            background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
         }
         
         .image-container:hover {
             transform: scale(1.02);
+            border-color: rgba(255, 75, 75, 0.3);
+        }
+        
+        .image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
         }
         
         .image-caption {
             text-align: center;
             color: rgba(255, 255, 255, 0.7);
-            margin-top: 0.5rem;
+            padding: 0.8rem;
             font-size: 0.9rem;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        /* 애니메이션 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 스크롤바 스타일 */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
         }
 
         /* Streamlit 기본 요소 조정 */
@@ -161,21 +224,36 @@ def set_custom_style():
         }
 
         .main > div:first-child {
-            padding-top: 5rem !important;  /* 상단 여백 추가 */
+            padding-top: 5rem !important;
         }
         </style>
     """, unsafe_allow_html=True)
 
-def typewriter_effect(text: str, speed: float = 0.03):
+def typewriter_effect(container, text: str, speed: float = 0.02):
     """텍스트를 타이핑 효과로 표시"""
-    message_placeholder = st.empty()
     full_text = ""
     for char in text:
         full_text += char
-        message_placeholder.markdown(full_text + "▌")
+        container.markdown(
+            f'<div class="message-bubble">{full_text}▌</div>',
+            unsafe_allow_html=True
+        )
         time.sleep(speed)
-    message_placeholder.markdown(full_text)
-    return message_placeholder
+    container.markdown(
+        f'<div class="message-bubble">{full_text}</div>',
+        unsafe_allow_html=True
+    )
+
+def initialize_session_state():
+    """세션 상태 초기화"""
+    if 'assistant' not in st.session_state:
+        api_key = st.secrets["OPENAI_API_KEY"]
+        st.session_state.assistant = SF49StudioAssistant(api_key)
+        st.session_state.assistant.create_assistant()
+        st.session_state.assistant.create_thread()
+    
+    if 'messages' not in st.session_state:
+        st.session_state.messages = []
 
 class SF49StudioAssistant:
     def __init__(self, api_key: str):
@@ -292,8 +370,7 @@ class SF49StudioAssistant:
         )
 
         generated_id = None
-        status_container = st.empty()
-        message_container = st.empty()
+        progress_placeholder = st.empty()
 
         while True:
             run = self.client.beta.threads.runs.retrieve(
@@ -314,7 +391,6 @@ class SF49StudioAssistant:
                         generated_id = result["unique_id"]
                         
                         if not result["success"]:
-                            typewriter_effect(result["message"])
                             return {
                                 "status": "error",
                                 "response": result["message"]
@@ -346,28 +422,17 @@ class SF49StudioAssistant:
                         "생성된 이미지를 최적화하고 있습니다..."
                     ]
                     
-                    chat_messages = [
-                        "디자인 작업이 순조롭게 진행되고 있습니다.",
-                        "각 요소를 세심하게 조정하고 있습니다.",
-                        "고품질의 결과물을 만들어내고 있습니다.",
-                        "디자인의 완성도를 높이고 있습니다.",
-                        "곧 멋진 결과물을 보여드릴 수 있을 것 같습니다.",
-                        "마지막 단계에 진입했습니다."
-                    ]
-                    
                     my_bar = st.progress(0)
                     
                     for i in range(100):
                         if i % 20 == 0:
                             progress_text = random.choice(progress_messages)
-                            chat_text = random.choice(chat_messages)
-                            message_container = typewriter_effect(chat_text, speed=0.02)
                         progress_value = (i + 1) / 100
                         my_bar.progress(progress_value, text=progress_text)
                         time.sleep(1)
 
                     my_bar.empty()
-                    message_container.empty()
+                    progress_placeholder.empty()
 
                     result = self.get_image_links(generated_id)
                     if result["success"] and result["images"]:
@@ -398,17 +463,6 @@ class SF49StudioAssistant:
                 }
             
             time.sleep(0.5)
-
-def initialize_session_state():
-    """세션 상태 초기화"""
-    if 'assistant' not in st.session_state:
-        api_key = st.secrets["OPENAI_API_KEY"]
-        st.session_state.assistant = SF49StudioAssistant(api_key)
-        st.session_state.assistant.create_assistant()
-        st.session_state.assistant.create_thread()
-    
-    if 'messages' not in st.session_state:
-        st.session_state.messages = []
 
 def main():
     st.set_page_config(
@@ -456,12 +510,15 @@ def main():
     st.title("SF49 Studio Designer")
     st.markdown('<p class="header-subtitle">AI 디자인 스튜디오</p>', unsafe_allow_html=True)
     
+    initialize_session_state()
+
     # 설명 텍스트 (처음 한번만 타이핑 효과)
     if 'shown_intro' not in st.session_state:
-        typewriter_effect("""
+        intro_container = st.empty()
+        typewriter_effect(intro_container, """
         💫 원하시는 이미지를 설명해 주세요
         🎯 최적의 디자인으로 구현해드립니다
-        """, speed=0.02)
+        """)
         st.session_state.shown_intro = True
     else:
         st.markdown("""
@@ -471,53 +528,60 @@ def main():
         </div>
         """, unsafe_allow_html=True)
 
-    initialize_session_state()
+    # 채팅 인터페이스
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(
+                f'<div class="message-bubble">{message["content"]}</div>',
+                unsafe_allow_html=True
+            )
+            
+            if "image_urls" in message:
+                st.markdown('<div class="image-grid">', unsafe_allow_html=True)
+                cols = st.columns(2)
+                for idx, url in enumerate(message["image_urls"]):
+                    with cols[idx % 2]:
+                        st.markdown(f"""
+                            <div class="image-container">
+                                <img src="{url}" alt="Generated Design {idx + 1}">
+                                <div class="image-caption">Design Option {idx + 1}</div>
+                            </div>
+                        """, unsafe_allow_html=True)
 
-    chat_container = st.container()
-    
-    with chat_container:
-        for message in st.session_state.messages:
-            with st.chat_message(message["role"]):
-                st.markdown(message["content"])
-                
-                if "image_urls" in message:
-                    cols = st.columns(2)
-                    for idx, url in enumerate(message["image_urls"]):
-                        with cols[idx % 2]:
-                            st.markdown(f"""
-                                <div class="image-container">
-                                    <img src="{url}">
-                                    <p class="image-caption">Design Option {idx + 1}</p>
-                                </div>
-                            """, unsafe_allow_html=True)
-
+    # 사용자 입력 처리
     if prompt := st.chat_input("어떤 이미지를 만들어드릴까요?"):
+        # 사용자 메시지 즉시 표시
         with st.chat_message("user"):
-            typewriter_effect(prompt, speed=0.02)
+            st.markdown(f'<div class="message-bubble">{prompt}</div>', unsafe_allow_html=True)
         st.session_state.messages.append({"role": "user", "content": prompt})
 
+        # Assistant 응답 처리
         with st.chat_message("assistant"):
+            response_container = st.empty()
             response = st.session_state.assistant.process_message(prompt)
             
             if response["status"] == "success":
-                typewriter_effect(response["response"], speed=0.02)
+                # 타이핑 효과로 응답 표시
+                typewriter_effect(response_container, response["response"])
                 message = {"role": "assistant", "content": response["response"]}
                 
+                # 이미지가 있으면 표시
                 if "images" in response and response["images"]:
                     message["image_urls"] = response["images"]
+                    st.markdown('<div class="image-grid">', unsafe_allow_html=True)
                     cols = st.columns(2)
                     for idx, url in enumerate(response["images"]):
                         with cols[idx % 2]:
                             st.markdown(f"""
                                 <div class="image-container">
-                                    <img src="{url}">
-                                    <p class="image-caption">Design Option {idx + 1}</p>
+                                    <img src="{url}" alt="Generated Design {idx + 1}">
+                                    <div class="image-caption">Design Option {idx + 1}</div>
                                 </div>
                             """, unsafe_allow_html=True)
                 
                 st.session_state.messages.append(message)
             else:
-                typewriter_effect(response["response"], speed=0.02)
+                typewriter_effect(response_container, response["response"])
 
 if __name__ == "__main__":
     main()
