@@ -9,6 +9,7 @@ import io
 import base64
 from PIL import Image
 
+
 def set_custom_style():
     st.markdown("""
         <style>
