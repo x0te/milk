@@ -492,17 +492,19 @@ def main():
                             """, unsafe_allow_html=True)
 
     if prompt := st.chat_input("어떤 이미지를 만들어드릴까요?"):
+        # 사용자 텍스트는 즉시 표시
         with st.chat_message("user"):
-            typewriter_effect(prompt, speed=0.02)
+            st.markdown(prompt)
         st.session_state.messages.append({"role": "user", "content": prompt})
 
+        # AI 응답은 타이핑 효과로 표시
         with st.chat_message("assistant"):
             response = st.session_state.assistant.process_message(prompt)
-            
             if response["status"] == "success":
                 typewriter_effect(response["response"], speed=0.02)
                 message = {"role": "assistant", "content": response["response"]}
                 
+                # 이미지 URL이 있으면 해당 URL도 표시
                 if "images" in response and response["images"]:
                     message["image_urls"] = response["images"]
                     cols = st.columns(2)
