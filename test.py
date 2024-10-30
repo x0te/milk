@@ -8,7 +8,7 @@ import random
 import io
 import base64
 from PIL import Image
-from streamlit_pages.streamlit_pages import MultiPage
+import streamlit_pages
 
 def set_custom_style():
     st.markdown("""
