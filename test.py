@@ -452,6 +452,9 @@ def initialize_session_state():
     
     if 'messages' not in st.session_state:
         st.session_state.messages = []
+    
+    if 'selected_thread' not in st.session_state:
+        st.session_state.selected_thread = None
 
 def main():
     initialize_session_state()
@@ -472,7 +475,6 @@ def main():
             if message["role"] == "user" and idx % 2 == 0:
                 if st.button(f"대화 스레드 #{(idx // 2) + 1}", key=f"thread_{idx}"):
                     st.session_state.selected_thread = idx // 2
-                    st.experimental_rerun()
 
     # 현재 선택된 대화 스레드 표시
     selected_thread = st.session_state.get("selected_thread")
