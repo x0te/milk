@@ -469,22 +469,18 @@ def main():
     with st.sidebar:
         st.header("💬 이전 대화 목록")
         for idx, message in enumerate(st.session_state.messages):
-            if message["role"] == "user":
-                if st.button(f"사용자: {message['content'][:30]}...", key=f"user_{idx}"):
-                    st.experimental_set_query_params(thread=idx)
-                    st.experimental_rerun()
-            elif message["role"] == "assistant":
-                if st.button(f"AI: {message['content'][:30]}...", key=f"ai_{idx}"):
-                    st.experimental_set_query_params(thread=idx)
+            if message["role"] == "user" and idx % 2 == 0:
+                if st.button(f"대화 스레드 #{(idx // 2) + 1}", key=f"thread_{idx}"):
+                    st.session_state.selected_thread = idx // 2
                     st.experimental_rerun()
 
     # 현재 선택된 대화 스레드 표시
-    query_params = st.experimental_get_query_params()
-    selected_thread = query_params.get("thread")
-    if selected_thread:
-        selected_thread = int(selected_thread[0])
+    selected_thread = st.session_state.get("selected_thread")
+    if selected_thread is not None:
+        start_idx = selected_thread * 2
         with st.expander(f"💬 대화 스레드 #{selected_thread + 1}", expanded=True):
-            for message in st.session_state.messages[selected_thread:]:
+            for i in range(start_idx, min(start_idx + 2, len(st.session_state.messages))):
+                message = st.session_state.messages[i]
                 with st.chat_message(message["role"]):
                     st.markdown(message["content"])
                 if "image_urls" in message:
