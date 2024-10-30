@@ -5,6 +5,10 @@ import json
 from typing import Dict, List, Optional
 import time
 import random
+import io
+from PIL import Image
+import numpy as np
+import cv2
 
 def set_custom_style():
     st.markdown("""
@@ -500,16 +504,25 @@ def main():
                     cols = st.columns(2)
                     for idx, url in enumerate(message["image_urls"]):
                         with cols[idx % 2]:
+                            buffer = io.BytesIO()
+                            img = Image.open(requests.get(url, stream=True).raw)
+                            img.save(buffer, format="PNG")
                             st.markdown(f"""
                                 <div class="image-container">
                                     <img src="{url}">
                                     <div class="overlay-buttons">
-                                        <a href="{url}" download="Design_Option_{idx + 1}" class="overlay-button" title="이미지 다운로드">💾</a>
+                                        <a href="{url}" download="Design_Option_{idx + 1}.png" class="overlay-button" title="이미지 다운로드">💾</a>
                                         <a href="{url}" target="_blank" class="overlay-button" title="크게 보기">🔍</a>
                                     </div>
                                     <p class="image-caption">Design Option {idx + 1}</p>
                                 </div>
                             """, unsafe_allow_html=True)
+                            st.download_button(
+                                label=f"Download Design Option {idx + 1}",
+                                data=buffer.getvalue(),
+                                file_name=f"Design_Option_{idx + 1}.png",
+                                mime="image/png"
+                            )
 
     if prompt := st.chat_input("어떤 이미지를 만들어드릴까요?"):
         # 사용자 텍스트는 즉시 표시
@@ -530,16 +543,25 @@ def main():
                     cols = st.columns(2)
                     for idx, url in enumerate(response["images"]):
                         with cols[idx % 2]:
+                            buffer = io.BytesIO()
+                            img = Image.open(requests.get(url, stream=True).raw)
+                            img.save(buffer, format="PNG")
                             st.markdown(f"""
                                 <div class="image-container">
                                     <img src="{url}">
                                     <div class="overlay-buttons">
-                                        <a href="{url}" download class="overlay-button" title="이미지 다운로드">💾</a>
+                                        <a href="{url}" download="Design_Option_{idx + 1}.png" class="overlay-button" title="이미지 다운로드">💾</a>
                                         <a href="{url}" target="_blank" class="overlay-button" title="크게 보기">🔍</a>
                                     </div>
                                     <p class="image-caption">Design Option {idx + 1}</p>
                                 </div>
                             """, unsafe_allow_html=True)
+                            st.download_button(
+                                label=f"Download Design Option {idx + 1}",
+                                data=buffer.getvalue(),
+                                file_name=f"Design_Option_{idx + 1}.png",
+                                mime="image/png"
+                            )
                 
                 st.session_state.messages.append(message)
             else:
