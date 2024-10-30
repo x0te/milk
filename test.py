@@ -260,16 +260,33 @@ def confetti_effect():
     </script>
     """, unsafe_allow_html=True)
 
-def glowing_text_effect(text: str):
-    """글로잉 텍스트 효과 표시"""
-    st.markdown(f"""
-    <p style="
-        font-size: 1.5rem;
-        font-weight: bold;
-        text-align: center;
-        color: #FFF;
-        text-shadow: 0 0 5px #FF0000, 0 0 10px #FF0000, 0 0 15px #FF0000;
-    ">{text}</p>
+def fireworks_effect():
+    """스트림릿에서 불꽃놀이 효과를 표시"""
+    st.markdown("""
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    <script>
+    const duration = 5 * 1000;
+    const animationEnd = Date.now() + duration;
+    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+    function randomInRange(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    (function frame() {
+      const timeLeft = animationEnd - Date.now();
+
+      if (timeLeft <= 0) {
+        return;
+      }
+
+      const particleCount = 50 * (timeLeft / duration);
+      confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+      confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+
+      requestAnimationFrame(frame);
+    }());
+    </script>
     """, unsafe_allow_html=True)
 
 class SF49StudioAssistant:
@@ -460,7 +477,7 @@ class SF49StudioAssistant:
                     if result["success"] and result["images"]:
                         st.balloons()
                         confetti_effect()
-                        glowing_text_effect("✨ 디자인이 완성되었습니다! 마음에 드시는 결과물이 있으신가요?")
+                        fireworks_effect()
                         return {
                             "status": "success",
                             "response": "✨ 디자인이 완성되었습니다! 마음에 드시는 결과물이 있으신가요?",
