@@ -7,8 +7,6 @@ import time
 import random
 import io
 from PIL import Image
-import numpy as np
-import cv2
 
 def set_custom_style():
     st.markdown("""
