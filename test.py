@@ -334,6 +334,9 @@ class SF49StudioAssistant:
 
     def process_message(self, user_message: str) -> Dict:
         """사용자 메시지 처리 및 응답 생성"""
+        if self.thread is None:
+            self.create_thread()
+
         self.client.beta.threads.messages.create(
             thread_id=self.thread.id,
             role="user",
@@ -414,6 +417,7 @@ class SF49StudioAssistant:
 
                     result = self.get_image_links(generated_id)
                     if result["success"] and result["images"]:
+                        st.balloons()
                         return {
                             "status": "success",
                             "response": "✨ 디자인이 완성되었습니다! 마음에 드시는 결과물이 있으신가요?",
@@ -448,13 +452,12 @@ def initialize_session_state():
         api_key = st.secrets["OPENAI_API_KEY"]
         st.session_state.assistant = SF49StudioAssistant(api_key)
         st.session_state.assistant.create_assistant()
-        st.session_state.assistant.create_thread()
     
     if 'messages' not in st.session_state:
         st.session_state.messages = []
     
-    if 'selected_thread' not in st.session_state:
-        st.session_state.selected_thread = None
+    if 'threads' not in st.session_state:
+        st.session_state.threads = []
 
 def main():
     initialize_session_state()
@@ -471,39 +474,16 @@ def main():
     # 사이드바에 이전 대화 내용 표시
     with st.sidebar:
         st.header("💬 이전 대화 목록")
-        for idx, message in enumerate(st.session_state.messages):
-            if message["role"] == "user" and idx % 2 == 0:
-                if st.button(f"대화 스레드 #{(idx // 2) + 1}", key=f"thread_{idx}"):
-                    st.session_state.selected_thread = idx // 2
+        for idx, thread in enumerate(st.session_state.threads):
+            if st.button(f"대화 스레드 #{idx + 1}", key=f"thread_{idx}"):
+                st.session_state.messages = thread
+                st.experimental_rerun()
 
-    # 현재 선택된 대화 스레드 표시
-    selected_thread = st.session_state.get("selected_thread")
-    if selected_thread is not None:
-        start_idx = selected_thread * 2
-        with st.expander(f"💬 대화 스레드 #{selected_thread + 1}", expanded=True):
-            for i in range(start_idx, min(start_idx + 2, len(st.session_state.messages))):
-                message = st.session_state.messages[i]
-                with st.chat_message(message["role"]):
-                    st.markdown(message["content"])
-                if "image_urls" in message:
-                    cols = st.columns(2)
-                    for idx, url in enumerate(message["image_urls"]):
-                        with cols[idx % 2]:
-                            buffer = io.BytesIO()
-                            img = Image.open(requests.get(url, stream=True).raw)
-                            img.save(buffer, format="PNG")
-                            img_base64 = base64.b64encode(buffer.getvalue()).decode()
-                            st.markdown(f"""
-                                <div class="image-container">
-                                    <img src="{url}">
-                                    <div class="overlay-buttons">
-                                        <a href="data:image/png;base64,{img_base64}" download="Design_Option_{idx + 1}.png" class="overlay-button" title="이미지 다운로드">💾</a>
-                                        <a href="{url}" target="_blank" class="overlay-button" title="크게 보기">🔍</a>
-                                    </div>
-                                    <p class="image-caption">Design Option {idx + 1}</p>
-                                </div>
-                            """, unsafe_allow_html=True)
-    
+        if st.button("새로운 대화 시작하기"):
+            st.session_state.messages = []
+            st.session_state.threads.append([])
+            st.experimental_rerun()
+
     # 상단 여백
     st.markdown('<div style="margin-top: 1rem;"></div>', unsafe_allow_html=True)
 
@@ -612,6 +592,9 @@ def main():
                 st.session_state.messages.append(message)
             else:
                 typewriter_effect(response["response"], speed=0.02)
+
+        # 새로운 대화 내용이 있으므로 현재 대화 스레드를 업데이트
+        st.session_state.threads[-1] = st.session_state.messages
 
 if __name__ == "__main__":
     main()
