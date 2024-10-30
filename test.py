@@ -511,18 +511,12 @@ def main():
                                 <div class="image-container">
                                     <img src="{url}">
                                     <div class="overlay-buttons">
-                                        <a href="data:image/png;base64,{img_base64}" download="Design_Option_{idx + 1}.png" class="overlay-button" title="이미지 다운로드">💾</a>
+                                        <button class="overlay-button" onclick="window.open('data:image/png;base64,{img_base64}','_self')" title="이미지 다운로드">💾</button>
                                         <a href="{url}" target="_blank" class="overlay-button" title="크게 보기">🔍</a>
                                     </div>
                                     <p class="image-caption">Design Option {idx + 1}</p>
                                 </div>
                             """, unsafe_allow_html=True)
-                            st.download_button(
-                                label=f"Download Design Option {idx + 1}",
-                                data=buffer.getvalue(),
-                                file_name=f"Design_Option_{idx + 1}.png",
-                                mime="image/png"
-                            )
 
     if prompt := st.chat_input("어떤 이미지를 만들어드릴까요?"):
         # 사용자 텍스트는 즉시 표시
@@ -551,18 +545,12 @@ def main():
                                 <div class="image-container">
                                     <img src="{url}">
                                     <div class="overlay-buttons">
-                                        <a href="data:image/png;base64,{img_base64}" download="Design_Option_{idx + 1}.png" class="overlay-button" title="이미지 다운로드">💾</a>
+                                        <button class="overlay-button" onclick="window.open('data:image/png;base64,{img_base64}','_self')" title="이미지 다운로드">💾</button>
                                         <a href="{url}" target="_blank" class="overlay-button" title="크게 보기">🔍</a>
                                     </div>
                                     <p class="image-caption">Design Option {idx + 1}</p>
                                 </div>
                             """, unsafe_allow_html=True)
-                            st.download_button(
-                                label=f"Download Design Option {idx + 1}",
-                                data=buffer.getvalue(),
-                                file_name=f"Design_Option_{idx + 1}.png",
-                                mime="image/png"
-                            )
                 
                 st.session_state.messages.append(message)
             else:
