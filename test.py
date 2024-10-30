@@ -100,6 +100,8 @@ def set_custom_style():
             padding: 0.8rem 1rem;
             border-radius: 6px;
             color: white;
+            width: calc(100% - 2rem);
+            margin: 0 auto;
         }
         
         .stTextInput > div > div > input:focus {
@@ -212,6 +214,8 @@ def set_custom_style():
             border-radius: 10px;
             margin-bottom: 1rem;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            width: calc(100% - 4rem);
+            margin: 0 auto;
         }
         </style>
     """, unsafe_allow_html=True)
@@ -449,15 +453,27 @@ def initialize_session_state():
     if 'messages' not in st.session_state:
         st.session_state.messages = []
 
+    if 'sidebar_state' not in st.session_state:
+        st.session_state.sidebar_state = "expanded"
+
 def main():
     st.set_page_config(
         page_title="SF49 Studio Designer",
         page_icon="🎨",
         layout="wide",
-        initial_sidebar_state="collapsed"
+        initial_sidebar_state=st.session_state.sidebar_state
     )
 
     set_custom_style()
+
+    # 사이드바에 이전 대화 내용 표시
+    with st.sidebar:
+        st.header("💬 이전 대화 목록")
+        for idx, message in enumerate(st.session_state.messages):
+            if message["role"] == "user":
+                st.text(f"사용자: {message['content'][:30]}...")
+            elif message["role"] == "assistant":
+                st.text(f"AI: {message['content'][:30]}...")
 
     # 상단 여백
     st.markdown('<div style="margin-top: 1rem;"></div>', unsafe_allow_html=True)
