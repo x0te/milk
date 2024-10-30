@@ -240,17 +240,16 @@ def set_custom_style():
         </style>
     """, unsafe_allow_html=True)
 
-def typewriter_effect(text: str, speed: float = 0.03, placeholder=None):
+def typewriter_effect(text: str, speed: float = 0.03):
     """텍스트를 타이핑 효과로 표시"""
-    if placeholder is None:
-        placeholder = st.empty()
+    message_placeholder = st.empty()
     full_text = ""
     for char in text:
         full_text += char
-        placeholder.markdown(full_text + "▌")
+        message_placeholder.markdown(full_text + "▌")
         time.sleep(speed)
-    placeholder.markdown(full_text)
-    return placeholder
+    message_placeholder.markdown(full_text)
+    return message_placeholder
 
 class SF49StudioAssistant:
     def __init__(self, api_key: str):
@@ -420,15 +419,15 @@ class SF49StudioAssistant:
                         "생성된 이미지를 최적화하고 있습니다..."
                     ]
                     
-                    progress_updates = 5  # 로딩 바 업데이트 횟수 줄이기
                     my_bar = st.progress(0)
                     
-                    for i in range(progress_updates):
-                        progress_text = random.choice(progress_messages)
-                        status_container.markdown(f"**{progress_text}**")
-                        progress_value = (i + 1) / progress_updates
+                    for i in range(100):
+                        if i % 20 == 0:
+                            progress_text = random.choice(progress_messages)
+                            status_container.markdown(f"**{progress_text}**")
+                        progress_value = (i + 1) / 100
                         my_bar.progress(progress_value)
-                        time.sleep(2)  # 업데이트 사이 간격을 늘려 사용자 경험 개선
+                        time.sleep(1)
 
                     my_bar.empty()
                     status_container.empty()
@@ -505,10 +504,9 @@ def main():
 
         # AI 응답은 타이핑 효과로 표시
         response = st.session_state.assistant.process_message(prompt)
-        placeholder = st.empty()
         with st.chat_message("assistant"):
             if response["status"] == "success":
-                typewriter_effect(response["response"], speed=0.02, placeholder=placeholder)
+                typewriter_effect(response["response"], speed=0.02)
                 message = {"role": "assistant", "content": response["response"]}
                 
                 # 이미지 URL이 있으면 해당 URL도 표시
@@ -534,7 +532,7 @@ def main():
                 
                 st.session_state.messages.append(message)
             else:
-                typewriter_effect(response["response"], speed=0.02, placeholder=placeholder)
+                typewriter_effect(response["response"], speed=0.02)
 
     # 최근 대화 목록 표시
     st.markdown("""
