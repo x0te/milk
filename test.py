@@ -12,246 +12,249 @@ from streamlit_extras.stylable_container import stylable_container
 
 
 def set_custom_style():
-    st.markdown("""
-        <style>
-        /* 기본 테마 */
-        .stApp {
-            background: linear-gradient(135deg, #1A1B1E 25%, #2C2F33 75%);
-            color: #EAEAEA;
-        }
+    with stylable_container(
+        key="main_container",
+        css_styles="""
+            {
+                background: linear-gradient(135deg, #1A1B1E 25%, #2C2F33 75%);
+                color: #EAEAEA;
+            }
+        """
+    ):
+        st.markdown("""
+            <style>
+            /* Streamlit 메인 컨테이너 배경색 오버라이드 */
+            .st-emotion-cache-1jicfl2 {
+                background: transparent !important;
+            }
 
-        /* Streamlit 메인 컨테이너 배경색 오버라이드 */
-        .st-emotion-cache-1jicfl2 {
-            background: transparent !important;
-        }
+            .st-emotion-cache-bm2z3a {
+                background: transparent !important;
+            }
+            
+            /* 네비게이션 컨테이너 */
+            .nav-container {
+                position: fixed;
+                top: 4.5rem;  /* Streamlit 헤더 고려 */
+                right: 20px;
+                z-index: 1000;
+                display: flex;
+                gap: 0.5rem;
+                background: transparent;
+            }
 
-        .st-emotion-cache-bm2z3a {
-            background: transparent !important;
-        }
-        
-        /* 네비게이션 컨테이너 */
-        .nav-container {
-            position: fixed;
-            top: 4.5rem;  /* Streamlit 헤더 고려 */
-            right: 20px;
-            z-index: 1000;
-            display: flex;
-            gap: 0.5rem;
-            background: transparent;
-        }
+            /* 아이콘 버튼 */
+            .nav-icon {
+                width: 40px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 50%;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                backdrop-filter: blur(10px);
+                font-size: 1.2rem;
+                text-decoration: none;
+                color: rgba(255, 255, 255, 0.8);
+                position: relative;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
 
-        /* 아이콘 버튼 */
-        .nav-icon {
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-            font-size: 1.2rem;
-            text-decoration: none;
-            color: rgba(255, 255, 255, 0.8);
-            position: relative;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
+            .nav-icon:hover {
+                background: rgba(255, 75, 75, 0.2);
+                transform: translateY(-2px);
+                border-color: rgba(255, 75, 75, 0.3);
+            }
 
-        .nav-icon:hover {
-            background: rgba(255, 75, 75, 0.2);
-            transform: translateY(-2px);
-            border-color: rgba(255, 75, 75, 0.3);
-        }
+            /* 툴팁 */
+            .nav-icon::after {
+                content: attr(data-tooltip);
+                position: absolute;
+                right: 50px;
+                top: 50%;
+                transform: translateY(-50%);
+                background: rgba(0, 0, 0, 0.8);
+                color: white;
+                padding: 0.5rem 1rem;
+                border-radius: 4px;
+                font-size: 0.875rem;
+                white-space: nowrap;
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.3s ease;
+                backdrop-filter: blur(10px);
+            }
 
-        /* 툴팁 */
-        .nav-icon::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            right: 50px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            font-size: 0.875rem;
-            white-space: nowrap;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
+            .nav-icon:hover::after {
+                opacity: 1;
+                visibility: visible;
+                right: 45px;
+            }
+            
+            /* 채팅 인터페이스 */
+            .stChatMessage {
+                background: rgba(255, 255, 255, 0.05) !important;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 8px;
+                padding: 1rem;
+                margin: 1rem 0;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            }
+            
+            .stChatMessage:hover {
+                border-color: rgba(255, 75, 75, 0.2);
+            }
+            
+            /* 입력 필드 */
+            .stTextInput > div > div > input {
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                padding: 0.8rem 1rem;
+                border-radius: 6px;
+                color: white;
+                width: calc(100% - 2rem);
+                margin: 0 auto;
+            }
+            
+            .stTextInput > div > div > input:focus {
+                border-color: #FF4B4B;
+                box-shadow: 0 0 0 1px rgba(255, 75, 75, 0.3);
+            }
+            
+            /* 프로그레스 바 */
+            .stProgress > div > div {
+                background: linear-gradient(90deg, #1DB954, #1ED760) !important;
+            }
+            
+            .stProgress {
+                background: rgba(255, 255, 255, 0.1);
+            }
+            
+            /* 캡션과 설명 텍스트 */
+            .header-subtitle {
+                color: rgba(255, 255, 255, 0.7);
+                font-size: 1.1rem;
+                margin-bottom: 2rem;
+            }
+            
+            .intro-text {
+                background: rgba(255, 255, 255, 0.05);
+                padding: 1.5rem;
+                border-radius: 8px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                margin: 1rem 0 2rem 0;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            }
+            
+            /* 이미지 스타일 */
+            .image-container {
+                margin: 1rem 0;
+                transition: all 0.3s ease;
+                position: relative;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            }
+            
+            .image-container img {
+                width: 100%;
+                border-radius: 8px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            
+            .image-container:hover {
+                transform: scale(1.02);
+            }
+            
+            .image-caption {
+                text-align: center;
+                color: rgba(255, 255, 255, 0.7);
+                margin-top: 0.5rem;
+                font-size: 0.9rem;
+            }
 
-        .nav-icon:hover::after {
-            opacity: 1;
-            visibility: visible;
-            right: 45px;
-        }
-        
-        /* 채팅 인터페이스 */
-        .stChatMessage {
-            background: rgba(255, 255, 255, 0.05) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            padding: 1rem;
-            margin: 1rem 0;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        .stChatMessage:hover {
-            border-color: rgba(255, 75, 75, 0.2);
-        }
-        
-        /* 입력 필드 */
-        .stTextInput > div > div > input {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 0.8rem 1rem;
-            border-radius: 6px;
-            color: white;
-            width: calc(100% - 2rem);
-            margin: 0 auto;
-        }
-        
-        .stTextInput > div > div > input:focus {
-            border-color: #FF4B4B;
-            box-shadow: 0 0 0 1px rgba(255, 75, 75, 0.3);
-        }
-        
-        /* 프로그레스 바 */
-        .stProgress > div > div {
-            background: linear-gradient(90deg, #1DB954, #1ED760) !important;
-        }
-        
-        .stProgress {
-            background: rgba(255, 255, 255, 0.1);
-        }
-        
-        /* 캡션과 설명 텍스트 */
-        .header-subtitle {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 1.1rem;
-            margin-bottom: 2rem;
-        }
-        
-        .intro-text {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 1.5rem;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            margin: 1rem 0 2rem 0;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        /* 이미지 스타일 */
-        .image-container {
-            margin: 1rem 0;
-            transition: all 0.3s ease;
-            position: relative;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        }
-        
-        .image-container img {
-            width: 100%;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .image-container:hover {
-            transform: scale(1.02);
-        }
-        
-        .image-caption {
-            text-align: center;
-            color: rgba(255, 255, 255, 0.7);
-            margin-top: 0.5rem;
-            font-size: 0.9rem;
-        }
+            /* 이미지 오버레이 버튼 */
+            .image-container .overlay-buttons {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                display: flex;
+                gap: 0.5rem;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
 
-        /* 이미지 오버레이 버튼 */
-        .image-container .overlay-buttons {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            display: flex;
-            gap: 0.5rem;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
+            .image-container:hover .overlay-buttons {
+                opacity: 1;
+            }
 
-        .image-container:hover .overlay-buttons {
-            opacity: 1;
-        }
+            .overlay-button {
+                background: rgba(0, 0, 0, 0.6);
+                color: white;
+                border: none;
+                padding: 0.5rem;
+                border-radius: 50%;
+                cursor: pointer;
+                font-size: 1.2rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: background 0.3s ease;
+            }
 
-        .overlay-button {
-            background: rgba(0, 0, 0, 0.6);
-            color: white;
-            border: none;
-            padding: 0.5rem;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1.2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.3s ease;
-        }
+            .overlay-button:hover {
+                background: rgba(255, 75, 75, 0.8);
+            }
 
-        .overlay-button:hover {
-            background: rgba(255, 75, 75, 0.8);
-        }
+            /* Streamlit 기본 요소 조정 */
+            .stDeployButton {
+                display: none;
+            }
+            
+            header[data-testid="stHeader"] {
+                background: rgba(26, 27, 30, 0.9);
+                backdrop-filter: blur(10px);
+            }
 
-        /* Streamlit 기본 요소 조정 */
-        .stDeployButton {
-            display: none;
-        }
-        
-        header[data-testid="stHeader"] {
-            background: rgba(26, 27, 30, 0.9);
-            backdrop-filter: blur(10px);
-        }
+            .main > div:first-child {
+                padding-top: 5rem !important;  /* 상단 여백 추가 */
+            }
 
-        .main > div:first-child {
-            padding-top: 5rem !important;  /* 상단 여백 추가 */
-        }
+            /* st-emotion-cache 영역 조정 */
+            .st-emotion-cache-qcqlej {
+                max-height: 70vh !important;
+                overflow-y: auto;
+            }
 
-        /* st-emotion-cache 영역 조정 */
-        .st-emotion-cache-qcqlej {
-            max-height: 70vh !important;
-            overflow-y: auto;
-        }
+            /* 채팅 컨테이너 스타일 */
+            .chat-container {
+                display: flex;
+                flex-direction: column;
+                height: calc(100vh - 200px);
+                margin-bottom: 20px;
+            }
 
-        /* 채팅 컨테이너 스타일 */
-        .chat-container {
-            display: flex;
-            flex-direction: column;
-            height: calc(100vh - 200px);
-            margin-bottom: 20px;
-        }
+            .messages-container {
+                flex-grow: 1;
+                overflow-y: auto;
+                padding: 20px;
+                margin-bottom: 20px;
+            }
 
-        .messages-container {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .input-container {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(26, 27, 30, 0.95);
-            padding: 20px;
-            backdrop-filter: blur(10px);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            z-index: 1000;
-        }
-        
-        </style>
-    """, unsafe_allow_html=True)
+            .input-container {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: rgba(26, 27, 30, 0.95);
+                padding: 20px;
+                backdrop-filter: blur(10px);
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+                z-index: 1000;
+            }
+            
+            </style>
+        """, unsafe_allow_html=True)
 
 def typewriter_effect(text: str, speed: float = 0.03):
     """텍스트를 타이핑 효과로 표시"""
