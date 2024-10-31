@@ -23,14 +23,11 @@ def set_custom_style():
     st.markdown("""
         <style>
         /* 라이트 테마 */
-        body {
-            background-color: #FFFFFF;
+        body, .stApp {
+            background-color: #FFFFFF !important;
             color: #2C3E50;
         }
-        .stApp {
-            background-color: #FFFFFF;
-            color: #2C3E50;
-        }
+        
         /* 네비게이션 컨테이너 */
         .nav-container {
             position: fixed;
