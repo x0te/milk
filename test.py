@@ -306,6 +306,40 @@ def set_custom_style():
                 padding-top: 60px !important;
             }
             
+            /* 불필요한 여백 제거 */
+            .st-emotion-cache-1v0mbdj,  /* stVerticalBlock */
+            .st-emotion-cache-16idsys,
+            .st-emotion-cache-10trblm,
+            .st-emotion-cache-1kyxreq,
+            .st-emotion-cache-1wbqy5l {
+                margin: 0 !important;
+                padding: 0 !important;
+                height: auto !important;
+                min-height: 0 !important;
+            }
+
+            /* 제목과 컨텐츠 위치 조정 */
+            [data-testid="stVerticalBlock"] {
+                gap: 0 !important;
+                padding: 0 !important;
+            }
+
+            /* 상단 여백 조정 */
+            .main .block-container {
+                padding-top: 60px !important;  /* 헤더 높이만큼만 여백 설정 */
+                max-width: none !important;
+            }
+
+            /* 추가 여백 제거 */
+            .st-emotion-cache-18ni7ap {
+                padding: 0 !important;
+            }
+
+            .st-emotion-cache-6qob1r {
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            
             </style>
         """, unsafe_allow_html=True)
 
