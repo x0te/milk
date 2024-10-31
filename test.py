@@ -253,6 +253,44 @@ def set_custom_style():
                 z-index: 1000;
             }
             
+            /* 헤더 기본 스타일 수정 */
+            .stAppHeader {
+                background-color: #FF5722 !important;
+                height: 4px !important;
+                padding: 0 !important;
+            }
+
+            /* 헤더 내부 모든 요소 숨기기 */
+            .stToolbarActions,
+            .stMainMenu,
+            .stDecoration,
+            .stToolbar,
+            [data-testid="stToolbarActions"],
+            [data-testid="stMainMenu"],
+            [data-testid="stDecoration"],
+            [data-testid="stToolbar"] {
+                display: none !important;
+                visibility: hidden !important;
+            }
+
+            /* 헤더 버튼 및 아이콘 제거 */
+            .stAppHeader button,
+            .stAppHeader svg,
+            .stToolbarActionButton,
+            .stBaseButton-header,
+            .stBaseButton-headerNoPadding {
+                display: none !important;
+                visibility: hidden !important;
+            }
+
+            /* 헤더 높이와 여백 조정 */
+            .stAppHeader {
+                min-height: 4px !important;
+                max-height: 4px !important;
+                margin: 0 !important;
+                border: none !important;
+            }
+            
             </style>
         """, unsafe_allow_html=True)
 
