@@ -154,7 +154,7 @@ def set_custom_style():
                 box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             }
             
-            /* 이미지 스��일 */
+            /* 이미지 스일 */
             .image-container {
                 margin: 1rem 0;
                 transition: all 0.3s ease;
@@ -288,7 +288,8 @@ def set_custom_style():
                 padding: 0 20px !important;
                 padding-left: 60% !important;
                 z-index: 999999 !important;
-                gap: 20px !important;
+                gap: 10px !important;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;
             }
 
             /* 아이콘 크기 조정 */
@@ -296,20 +297,21 @@ def set_custom_style():
                 width: 40px !important;
                 height: 40px !important;
                 font-size: 1.5rem !important;
-                background: transparent !important;
+                background: rgba(255, 255, 255, 0.1) !important;
                 border: none !important;
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
                 margin: 0 5px !important;
                 transition: all 0.3s ease !important;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) !important;
+                border-radius: 50% !important;
             }
 
             .nav-icon:hover {
-                background: rgb(36, 37, 39) !important;
-                transform: translateY(0) !important;
-                border: none !important;
-                border-radius: 50% !important;
+                background: rgba(255, 255, 255, 0.2) !important;
+                transform: translateY(-2px) !important;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
             }
 
             /* 툴팁 위치 재조정 */
@@ -541,7 +543,7 @@ class SF49StudioAssistant:
             }
 
     def process_message(self, user_message: str) -> Dict:
-        """��용자 메시지 처리 및 응답 생성"""
+        """용자 메시지 처리 및 응답 생성"""
         if self.thread is None:
             self.create_thread()
 
