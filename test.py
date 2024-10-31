@@ -213,6 +213,33 @@ def set_custom_style():
             max-height: 70vh !important;
             overflow-y: auto;
         }
+
+        /* 채팅 컨테이너 스타일 */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 200px);
+            margin-bottom: 20px;
+        }
+
+        .messages-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .input-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(26, 27, 30, 0.95);
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+        }
         
         </style>
     """, unsafe_allow_html=True)
@@ -606,22 +633,10 @@ def main():
                 """, unsafe_allow_html=True)
         st.session_state.shown_intro = True
 
-    with stylable_container(
-        key="chat_container",
-        css_styles="""
-            {
-                max-height: 70vh;
-                overflow-y: auto;
-                background: rgba(255, 255, 255, 0.02);
-                border-radius: 8px;
-                padding: 1rem;
-                margin: 1rem 0;
-            }
-        """
-    ):
-        chat_container = st.container()
-        
-        with chat_container:
+    # 채팅 컨테이너
+    with st.container():
+        # 메시지 표시 영역
+        with st.container():
             for message in st.session_state.messages:
                 with st.chat_message(message["role"]):
                     st.markdown(message["content"])
@@ -644,44 +659,45 @@ def main():
                                         <p class="image-caption">Design Option {idx + 1}</p>
                                     </div>
                                 """, unsafe_allow_html=True)
-                            
-    if prompt := st.chat_input("어떤 이미지를 만들어드릴까요?"):
-        # 사용자 텍스트는 즉시 표시
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        with st.chat_message("user"):
-            st.markdown(prompt)
 
-        # AI 응답은 타이핑 효과로 표시
-        response = st.session_state.assistant.process_message(prompt)
-        with st.chat_message("assistant"):
-            if response["status"] == "success":
-                typewriter_effect(response["response"], speed=0.02)
-                message = {"role": "assistant", "content": response["response"]}
-                
-                # 이미지 URL이 있으면 해당 URL도 표시
-                if "images" in response and response["images"]:
-                    message["image_urls"] = response["images"]
-                    cols = st.columns(2)
-                    for idx, url in enumerate(response["images"]):
-                        with cols[idx % 2]:
-                            buffer = io.BytesIO()
-                            img = Image.open(requests.get(url, stream=True).raw)
-                            img.save(buffer, format="PNG")
-                            img_base64 = base64.b64encode(buffer.getvalue()).decode()
-                            st.markdown(f"""
-                                <div class="image-container">
-                                    <img src="{url}">
-                                    <div class="overlay-buttons">
-                                        <a href="data:image/png;base64,{img_base64}" download="Design_Option_{idx + 1}.png" class="overlay-button" title="이미지 다운로드">💾</a>
-                                        <a href="{url}" target="_blank" class="overlay-button" title="크게 보기">🔍</a>
-                                    </div>
-                                    <p class="image-caption">Design Option {idx + 1}</p>
-                                </div>
-                            """, unsafe_allow_html=True)
-                
-                st.session_state.messages.append(message)
-            else:
-                typewriter_effect(response["response"], speed=0.02)
+        # 입력 영역
+        with st.container():
+            st.markdown('<div class="input-container">', unsafe_allow_html=True)
+            if prompt := st.chat_input("어떤 이미지를 만들어드릴까요?"):
+                st.session_state.messages.append({"role": "user", "content": prompt})
+                with st.chat_message("user"):
+                    st.markdown(prompt)
+
+                response = st.session_state.assistant.process_message(prompt)
+                with st.chat_message("assistant"):
+                    if response["status"] == "success":
+                        typewriter_effect(response["response"], speed=0.02)
+                        message = {"role": "assistant", "content": response["response"]}
+                        
+                        if "images" in response and response["images"]:
+                            message["image_urls"] = response["images"]
+                            cols = st.columns(2)
+                            for idx, url in enumerate(response["images"]):
+                                with cols[idx % 2]:
+                                    buffer = io.BytesIO()
+                                    img = Image.open(requests.get(url, stream=True).raw)
+                                    img.save(buffer, format="PNG")
+                                    img_base64 = base64.b64encode(buffer.getvalue()).decode()
+                                    st.markdown(f"""
+                                        <div class="image-container">
+                                            <img src="{url}">
+                                            <div class="overlay-buttons">
+                                                <a href="data:image/png;base64,{img_base64}" download="Design_Option_{idx + 1}.png" class="overlay-button" title="이미지 다운로드">💾</a>
+                                                <a href="{url}" target="_blank" class="overlay-button" title="크게 보기">🔍</a>
+                                            </div>
+                                            <p class="image-caption">Design Option {idx + 1}</p>
+                                        </div>
+                                    """, unsafe_allow_html=True)
+                        
+                        st.session_state.messages.append(message)
+                    else:
+                        typewriter_effect(response["response"], speed=0.02)
+            st.markdown('</div>', unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
