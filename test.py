@@ -8,6 +8,7 @@ import random
 import io
 import base64
 from PIL import Image
+from streamlit_extras.stylable_container import stylable_container
 
 
 def set_custom_style():
@@ -206,20 +207,37 @@ def set_custom_style():
         .main > div:first-child {
             padding-top: 5rem !important;  /* 상단 여백 추가 */
         }
+
+        /* st-emotion-cache 영역 조정 */
+        .st-emotion-cache-qcqlej {
+            max-height: 70vh !important;
+            overflow-y: auto;
+        }
         
         </style>
     """, unsafe_allow_html=True)
 
 def typewriter_effect(text: str, speed: float = 0.03):
     """텍스트를 타이핑 효과로 표시"""
-    message_placeholder = st.empty()
-    full_text = ""
-    for char in text:
-        full_text += char
-        message_placeholder.markdown(full_text + "▌")
-        time.sleep(speed)
-    message_placeholder.markdown(full_text)
-    return message_placeholder
+    with stylable_container(
+        key="typewriter",
+        css_styles="""
+            {
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 8px;
+                padding: 1rem;
+                margin: 0.5rem 0;
+            }
+        """
+    ):
+        message_placeholder = st.empty()
+        full_text = ""
+        for char in text:
+            full_text += char
+            message_placeholder.markdown(full_text + "▌")
+            time.sleep(speed)
+        message_placeholder.markdown(full_text)
+        return message_placeholder
 
 def confetti_effect():
     """스트림릿에서 confetti 효과를 표시"""
@@ -450,18 +468,29 @@ class SF49StudioAssistant:
                         "생성된 이미지를 최적화하고 있습니다..."
                     ]
                     
-                    my_bar = st.progress(0)
-                    
-                    for i in range(100):
-                        if i % 20 == 0:
-                            progress_text = random.choice(progress_messages)
-                            status_container.markdown(f"**{progress_text}**")
-                        progress_value = (i + 1) / 100
-                        my_bar.progress(progress_value)
-                        time.sleep(1)
+                    with stylable_container(
+                        key="progress_container",
+                        css_styles="""
+                            {
+                                background: rgba(255, 255, 255, 0.05);
+                                border-radius: 8px;
+                                padding: 1rem;
+                                margin: 1rem 0;
+                            }
+                        """
+                    ):
+                        my_bar = st.progress(0)
+                        
+                        for i in range(100):
+                            if i % 20 == 0:
+                                progress_text = random.choice(progress_messages)
+                                status_container.markdown(f"**{progress_text}**")
+                            progress_value = (i + 1) / 100
+                            my_bar.progress(progress_value)
+                            time.sleep(1)
 
-                    my_bar.empty()
-                    status_container.empty()
+                        my_bar.empty()
+                        status_container.empty()
 
                     result = self.get_image_links(generated_id)
                     if result["success"] and result["images"]:
@@ -559,38 +588,62 @@ def main():
     
     # 설명 텍스트 (항상 말풍선으로 표시)
     if 'shown_intro' not in st.session_state:
-        with st.chat_message("assistant"):
-            st.markdown("""
-            💫 원하시는 이미지를 설명해 주세요<br>
-            🎯 최적의 디자인으로 구현해드립니다
-            """, unsafe_allow_html=True)
+        with stylable_container(
+            key="intro_message",
+            css_styles="""
+                {
+                    background: rgba(255, 255, 255, 0.05);
+                    border-radius: 8px;
+                    padding: 1rem;
+                    margin: 1rem 0;
+                }
+            """
+        ):
+            with st.chat_message("assistant"):
+                st.markdown("""
+                💫 원하시는 이미지를 설명해 주세요<br>
+                🎯 최적의 디자인으로 구현해드립니다
+                """, unsafe_allow_html=True)
         st.session_state.shown_intro = True
 
-    chat_container = st.container()
-    
-    with chat_container:
-        for message in st.session_state.messages:
-            with st.chat_message(message["role"]):
-                st.markdown(message["content"])
-                
-                if "image_urls" in message:
-                    cols = st.columns(2)
-                    for idx, url in enumerate(message["image_urls"]):
-                        with cols[idx % 2]:
-                            buffer = io.BytesIO()
-                            img = Image.open(requests.get(url, stream=True).raw)
-                            img.save(buffer, format="PNG")
-                            img_base64 = base64.b64encode(buffer.getvalue()).decode()
-                            st.markdown(f"""
-                                <div class="image-container">
-                                    <img src="{url}">
-                                    <div class="overlay-buttons">
-                                        <a href="data:image/png;base64,{img_base64}" download="Design_Option_{idx + 1}.png" class="overlay-button" title="이미지 다운로드">💾</a>
-                                        <a href="{url}" target="_blank" class="overlay-button" title="크게 보기">🔍</a>
+    with stylable_container(
+        key="chat_container",
+        css_styles="""
+            {
+                max-height: 70vh;
+                overflow-y: auto;
+                background: rgba(255, 255, 255, 0.02);
+                border-radius: 8px;
+                padding: 1rem;
+                margin: 1rem 0;
+            }
+        """
+    ):
+        chat_container = st.container()
+        
+        with chat_container:
+            for message in st.session_state.messages:
+                with st.chat_message(message["role"]):
+                    st.markdown(message["content"])
+                    
+                    if "image_urls" in message:
+                        cols = st.columns(2)
+                        for idx, url in enumerate(message["image_urls"]):
+                            with cols[idx % 2]:
+                                buffer = io.BytesIO()
+                                img = Image.open(requests.get(url, stream=True).raw)
+                                img.save(buffer, format="PNG")
+                                img_base64 = base64.b64encode(buffer.getvalue()).decode()
+                                st.markdown(f"""
+                                    <div class="image-container">
+                                        <img src="{url}">
+                                        <div class="overlay-buttons">
+                                            <a href="data:image/png;base64,{img_base64}" download="Design_Option_{idx + 1}.png" class="overlay-button" title="이미지 다운로드">💾</a>
+                                            <a href="{url}" target="_blank" class="overlay-button" title="크게 보기">🔍</a>
+                                        </div>
+                                        <p class="image-caption">Design Option {idx + 1}</p>
                                     </div>
-                                    <p class="image-caption">Design Option {idx + 1}</p>
-                                </div>
-                            """, unsafe_allow_html=True)
+                                """, unsafe_allow_html=True)
                             
     if prompt := st.chat_input("어떤 이미지를 만들어드릴까요?"):
         # 사용자 텍스트는 즉시 표시
