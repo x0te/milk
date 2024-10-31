@@ -10,7 +10,14 @@ import base64
 from PIL import Image
 from streamlit_extras.stylable_container import stylable_container
 
-
+def do_stuff_on_page_load():
+    st.set_page_config(
+        page_title="SF49.Studio Designer",
+        page_icon="🎨",
+        layout="centered",
+        initial_sidebar_state="collapsed",
+    )
+    
 def set_custom_style():
     with stylable_container(
         key="main_container",
