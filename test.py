@@ -212,6 +212,7 @@ def set_custom_style():
             }
             
             header[data-testid="stHeader"] {
+                display: none !important;  /* 헤더 숨기기 */
                 background: rgba(26, 27, 30, 0.9);
                 backdrop-filter: blur(10px);
             }
