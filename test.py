@@ -257,7 +257,7 @@ def set_custom_style():
             
             /* 미드 센츄리 스타일 헤더 */
             .midcentury-header {
-                position: fixed;
+                position: absolute;
                 top: 0;
                 left: 0;
                 right: 0;
@@ -267,9 +267,10 @@ def set_custom_style():
                 box-shadow: 0 2px 4px rgba(255, 87, 34, 0.2);
             }
 
-            /* 기존 Streamlit 헤더 숨기기 */
-            header[data-testid="stHeader"] {
-                display: none !important;
+            /* 메인 컨테이너 조정 */
+            [data-testid="stMainBlockContainer"] {
+                position: relative;
+                padding-top: 4px !important;
             }
 
             /* 컨텐츠 상단 여백 조정 */
