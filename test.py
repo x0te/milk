@@ -485,6 +485,10 @@ class SF49StudioAssistant:
             당신은 SF49 Studio의 전문 디자이너처럼 행동합니다.
             창의적인 디자이너의 관점과 전문적이고 세련된 언어를 사용하며, 전문가의 톤을 유지합니다.
             모든 커뮤니케이션에서 명확성, 디자인적 미적 감각, 그리고 전문성을 우선시합니다.
+            
+            중요: 이미지 생성 요청 시 unique_id는 반드시 끝에 1000에서 9999 사이의 랜덤한 숫자를 추가하여 생성해야 합니다.
+            예시: design_request_1234, creative_image_5678, visual_concept_9012 등
+            절대로 같은 ID가 중복되지 않도록 해야 합니다.
             """,
             model="gpt-4o-mini",
             tools=[{
@@ -501,7 +505,7 @@ class SF49StudioAssistant:
                             },
                             "unique_id": {
                                 "type": "string",
-                                "description": "생성할 이미지의 고유 ID"
+                                "description": "생성할 이미지의 고유 ID (반드시 끝에 1000-9999 사이의 랜덤 ���자 포함)"
                             }
                         },
                         "required": ["visualization_text", "unique_id"]
@@ -569,7 +573,7 @@ class SF49StudioAssistant:
             }
 
     def process_message(self, user_message: str) -> Dict:
-        """용자 메시지 처리 및 응답 생성"""
+        """사용자 메시지 처리 및 응답 생성"""
         if self.thread is None:
             self.create_thread()
 
@@ -586,6 +590,7 @@ class SF49StudioAssistant:
 
         generated_id = None
         status_container = st.empty()
+        loading_container = st.empty()
 
         while True:
             run = self.client.beta.threads.runs.retrieve(
@@ -630,53 +635,36 @@ class SF49StudioAssistant:
 
                 if generated_id:
                     progress_messages = [
-                        "이미지 생성을 위한 초기 설정을 준비하고 있습니다...",
-                        "아이디어를 시각적 요소로 분석하고 있습니다...",
-                        "디자인 요소를 구성하고 있습니다...",
-                        "이미지의 세부 요소를 조정하고 있습니다...",
-                        "최종 디테일을 다듬고 있습니다...",
-                        "생성된 이미지를 최적화하고 있습니다..."
+                        "🐌 이미지를 생성하고 있어요... 조금만 기다려주세요",
+                        "🐌 열심히 그리고 있어요...",
+                        "🐌 거의 다 왔어요...",
+                        "🐌 마무리 작업 중이에요..."
                     ]
                     
-                    with stylable_container(
-                        key="progress_container",
-                        css_styles="""
-                            {
-                                background: rgba(255, 255, 255, 0.05);
-                                border-radius: 8px;
-                                padding: 1rem;
-                                margin: 1rem 0;
+                    # 60초 대기
+                    for _ in range(60):
+                        status_text = random.choice(progress_messages)
+                        loading_container.markdown(f"**{status_text}**")
+                        time.sleep(1)
+
+                    # 이미지 확인 반복
+                    while True:
+                        result = self.get_image_links(generated_id)
+                        if result["success"] and result["images"]:
+                            loading_container.empty()
+                            st.balloons()
+                            confetti_effect()
+                            fireworks_effect()
+                            return {
+                                "status": "success",
+                                "response": "✨ 디자인이 완성되었습니다! 마음에 드시는 결과물이 있으신가요?",
+                                "images": result["images"]
                             }
-                        """
-                    ):
-                        my_bar = st.progress(0)
-                        
-                        for i in range(100):
-                            if i % 20 == 0:
-                                progress_text = random.choice(progress_messages)
-                                status_container.markdown(f"**{progress_text}**")
-                            progress_value = (i + 1) / 100
-                            my_bar.progress(progress_value)
-                            time.sleep(1)
-
-                        my_bar.empty()
-                        status_container.empty()
-
-                    result = self.get_image_links(generated_id)
-                    if result["success"] and result["images"]:
-                        st.balloons()
-                        confetti_effect()
-                        fireworks_effect()
-                        return {
-                            "status": "success",
-                            "response": "✨ 디자인이 완성되었습니다! 마음에 드시는 결과물이 있으신가요?",
-                            "images": result["images"]
-                        }
-                    else:
-                        return {
-                            "status": "error",
-                            "response": "🎨 이미지 생성에 시간이 더 필요합니다. 잠시 후에 다시 시도해 주시겠어요?"
-                        }
+                        else:
+                            # 이미지가 아직 준비되지 않은 경우
+                            status_text = random.choice(progress_messages)
+                            loading_container.markdown(f"**{status_text}**")
+                            time.sleep(5)  # 5초 대기 후 다시 확인
 
             elif run.status == "completed":
                 messages = self.client.beta.threads.messages.list(
@@ -690,7 +678,7 @@ class SF49StudioAssistant:
             elif run.status == "failed":
                 return {
                     "status": "error",
-                    "response": "처리 중 문제가 발생했습니다. 다시 시도해주세."
+                    "response": "처리 중 문제가 발생했습니다. 다시 시도해주세요."
                 }
             
             time.sleep(0.5)
