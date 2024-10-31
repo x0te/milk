@@ -348,90 +348,6 @@ def set_custom_style():
                 padding: 0 !important;
             }
             
-            /* 전체 컨테이너 최대 너비 제한 */
-            .stApp {
-                max-width: 1200px !important;  /* 최대 너비 설정 */
-                margin: 0 !important;          /* 중앙 정렬 제거 */
-                position: relative !important;
-            }
-
-            /* 네비게이션 컨테이너 너비 제한 */
-            .nav-container {
-                max-width: 1200px !important;
-                width: 100% !important;
-                margin: 0 !important;
-                left: 0 !important;
-                transform: none !important;    /* 중앙 정렬 transform 제거 */
-                padding: 0 20px !important;
-                box-sizing: border-box !important;
-            }
-
-            /* 메인 컨텐츠 영역 너비 제한 */
-            .main .block-container,
-            [data-testid="stVerticalBlock"],
-            .stMarkdown,
-            .element-container {
-                max-width: 1200px !important;
-                padding-left: 20px !important;
-                padding-right: 20px !important;
-                box-sizing: border-box !important;
-                margin-left: 0 !important;     /* 왼쪽 정렬 유지 */
-            }
-
-            /* 배경 오렌지 라인은 전체 너비로 유지 */
-            .nav-container::before {
-                content: '' !important;
-                position: fixed !important;
-                top: 0 !important;
-                left: 0 !important;
-                right: 0 !important;
-                height: 60px !important;
-                background-color: #FF5722 !important;
-                z-index: -1 !important;
-            }
-            
-            /* 기본 컨테이너 너비 제한 */
-            .block-container {
-                max-width: 1200px !important;
-                padding-left: 20px !important;
-                padding-right: 20px !important;
-                box-sizing: border-box !important;
-            }
-
-            /* 네비게이션 컨테이너 */
-            .nav-container {
-                max-width: 1200px !important;
-                width: 100% !important;
-                padding: 0 20px !important;
-                box-sizing: border-box !important;
-                position: fixed !important;
-                top: 0 !important;
-                left: 0 !important;
-                height: 60px !important;
-                background-color: #FF5722 !important;
-                display: flex !important;
-                justify-content: flex-end !important;
-                align-items: center !important;
-                z-index: 999999 !important;
-            }
-
-            /* 네비게이션 아이콘 스타일 유지 */
-            .nav-icon {
-                width: 40px !important;
-                height: 40px !important;
-                font-size: 1.5rem !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                margin: 0 5px !important;
-                transition: all 0.3s ease !important;
-            }
-
-            .nav-icon:hover {
-                background: rgb(36, 37, 39) !important;
-                border-radius: 50% !important;
-            }
-            
             </style>
         """, unsafe_allow_html=True)
 
@@ -820,7 +736,7 @@ def main():
             with st.chat_message("assistant"):
                 st.markdown("""
                 💫 원하시는 이미지를 설명해 주세요<br>
-                🎯 최��의 디자인으로 구현해드립니다
+                🎯 최적의 디자인으로 구현해드립니다
                 """, unsafe_allow_html=True)
         st.session_state.shown_intro = True
 
