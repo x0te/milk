@@ -28,6 +28,11 @@ def set_custom_style():
             color: #2C3E50;
         }
         
+        /* 메인 블록 컨테이너 스타일 적용 */
+        .block-container {
+            background-color: #FFFFFF !important;
+        }
+        
         /* 네비게이션 컨테이너 */
         .nav-container {
             position: fixed;
