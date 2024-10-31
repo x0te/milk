@@ -24,7 +24,7 @@ def set_custom_style():
         <style>
         /* 라이트 테마 */
         .stApp {
-            background: linear-gradient(135deg, #FFFFFF 25%, #F8F9FA 75%);
+            background-color: #FFFFFF;
             color: #2C3E50;
         }
         /* 네비게이션 컨테이너 */
