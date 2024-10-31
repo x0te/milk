@@ -643,37 +643,73 @@ class SF49StudioAssistant:
                 )
 
                 if generated_id:
-                    progress_messages = [
-                        "🐌 이미지를 생성하고 있어요... 조금만 기다려주세요",
-                        "🐌 열심히 그리고 있어요...",
-                        "🐌 거의 다 왔어요...",
-                        "🐌 마무리 작업 중이에요..."
+                    snail_frames = [
+                        "🐌 ⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯",
+                        "⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯",
+                        "⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯",
+                        "⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯⋯",
+                        "⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯",
+                        "⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯",
+                        "⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯",
+                        "⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯",
+                        "⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯",
+                        "⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯",
+                        "⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯",
+                        "⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯",
+                        "⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌",
+                    ]
+
+                    loading_messages = [
+                        "열심히 그리는 중이에요",
+                        "거의 다 왔어요",
+                        "마무리 작업 중이에요",
+                        "디테일을 다듬고 있어요",
+                        "색감을 조정하고 있어요",
+                        "마지막 터치를 하고 있어요"
                     ]
                     
-                    # 60초 대기
-                    for _ in range(60):
-                        status_text = random.choice(progress_messages)
-                        loading_container.markdown(f"**{status_text}**")
+                    loading_container = st.empty()
+                    message_container = st.empty()
+                    
+                    # 첫 60초 동안 기본 대기
+                    for i in range(60):
+                        frame = snail_frames[i % len(snail_frames)]
+                        message = loading_messages[i % len(loading_messages)]
+                        
+                        loading_container.markdown(f"""
+                            <div style='font-family: monospace; font-size: 1.5em; margin-bottom: 0.5em;'>
+                                {frame}
+                            </div>
+                        """, unsafe_allow_html=True)
+                        message_container.markdown(f"### {message}")
                         time.sleep(1)
 
-                    # 이미지 확인 반복
+                    # 60초 이후부터는 5초마다 이미지 체크
                     while True:
+                        # 이미지 체크
                         result = self.get_image_links(generated_id)
                         if result["success"] and result["images"]:
                             loading_container.empty()
+                            message_container.empty()
                             st.balloons()
                             confetti_effect()
                             fireworks_effect()
                             return {
                                 "status": "success",
-                                "response": "✨ 디자인이 완성되���습니다! 마음에 드시는 결과물이 있으신가요?",
+                                "response": "✨ 디자인이 완성되었습니다! 마음에 드시나요?",
                                 "images": result["images"]
                             }
-                        else:
-                            # 이미지가 아직 준비되지 않은 경우
-                            status_text = random.choice(progress_messages)
-                            loading_container.markdown(f"**{status_text}**")
-                            time.sleep(5)  # 5초 대기 후 다시 확인
+                        
+                        # 다음 체크까지 5초 대기하면서 달팽이 애니메이션 표시
+                        status_text = random.choice(loading_messages)
+                        for frame in snail_frames:
+                            loading_container.markdown(f"""
+                                <div style='font-family: monospace; font-size: 1.5em; margin-bottom: 0.5em;'>
+                                    {frame}
+                                </div>
+                            """, unsafe_allow_html=True)
+                            message_container.markdown(f"### {status_text}")
+                            time.sleep(0.4)  # 5초 / 13프레임 ≈ 0.4초
 
             elif run.status == "completed":
                 messages = self.client.beta.threads.messages.list(
