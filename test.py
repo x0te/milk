@@ -814,4 +814,5 @@ def main():
             st.markdown('</div>', unsafe_allow_html=True)
 
 if __name__ == "__main__":
+    do_stuff_on_page_load()
     main()
