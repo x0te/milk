@@ -21,7 +21,22 @@ def apply_custom_css():
             margin: 0;
             max-width: 1200px;
         }
+        
+        /* 스트림릿 헤더 스타일 수정 */
+        .stAppHeader {
+            background-color: #32CD32 !important;  /* 라임 그린 */
+        }
 
+        /* 네비게이션 아이콘 배경색 수정 */
+        .nav-icon {
+            background-color: #32CD32 !important;  /* 라임 그린 (반투명) */
+            border: 1px solid rgba(50, 205, 50, 0.3) !important;
+        }
+
+        .nav-icon:hover {
+            background: rgba(50, 205, 50, 0.4) !important;
+            border-color: rgba(50, 205, 50, 0.5) !important;
+        }
         div[data-testid="stVerticalBlock"]:has(> div.element-container > div.stMarkdown > div[data-testid="stMarkdownContainer"] > p > span.chat_input_container) {
             background-color: transparent;
             padding: 1.5rem;
@@ -570,7 +585,6 @@ class SF49StudioAssistant:
                                 "status": "error",
                                 "response": "🎨 이미지 생성에 시간이 더 필요합니다. 잠시 후에 다시 시도해 주세요."
                             }
-
                 elif run.status == "completed":
                     messages = self.client.client.beta.threads.messages.list(
                         thread_id=self.thread.id
