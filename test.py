@@ -294,6 +294,14 @@ def set_custom_style():
                 align-items: center !important;
                 justify-content: center !important;
                 margin: 0 5px !important;
+                transition: all 0.3s ease !important;
+            }
+
+            .nav-icon:hover {
+                background: rgb(36, 37, 39) !important;
+                transform: translateY(0) !important;
+                border: none !important;
+                border-radius: 50% !important;
             }
 
             /* 툴팁 위치 재조정 */
