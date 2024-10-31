@@ -104,9 +104,10 @@ def set_custom_style():
                 background: rgba(255, 255, 255, 0.05) !important;
                 border: 1px solid rgba(255, 255, 255, 0.1);
                 border-radius: 8px;
-                padding: 1rem;
-                margin: 1rem 0;
+                padding: 1.2rem !important;
+                margin: 1.2rem 0 !important;
                 box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+                font-size: 1.1rem !important;
             }
             
             .stChatMessage:hover {
@@ -117,11 +118,12 @@ def set_custom_style():
             .stTextInput > div > div > input {
                 background: rgba(255, 255, 255, 0.05);
                 border: 1px solid rgba(255, 255, 255, 0.1);
-                padding: 0.8rem 1rem;
+                padding: 1rem 1.2rem !important;
                 border-radius: 6px;
                 color: white;
                 width: calc(100% - 2rem);
                 margin: 0 auto;
+                font-size: 1.1rem !important;
             }
             
             .stTextInput > div > div > input:focus {
@@ -141,7 +143,7 @@ def set_custom_style():
             /* 캡션과 설명 텍스트 */
             .header-subtitle {
                 color: rgba(255, 255, 255, 0.7);
-                font-size: 1.1rem;
+                font-size: 1.3rem !important;
                 margin-bottom: 2rem;
             }
             
@@ -175,8 +177,8 @@ def set_custom_style():
             .image-caption {
                 text-align: center;
                 color: rgba(255, 255, 255, 0.7);
-                margin-top: 0.5rem;
-                font-size: 0.9rem;
+                margin-top: 0.8rem;
+                font-size: 1.1rem !important;
             }
 
             /* 이미지 오버레이 버튼 */
@@ -358,6 +360,30 @@ def set_custom_style():
                 padding: 0 !important;
             }
             
+            /* Streamlit 기본 텍스트 크기 조정 */
+            .stMarkdown, .stText {
+                font-size: 1.1rem !important;
+            }
+
+            /* 제목 크기 조정 */
+            h1 {
+                font-size: 2.5rem !important;
+            }
+
+            h2 {
+                font-size: 2rem !important;
+            }
+
+            h3 {
+                font-size: 1.75rem !important;
+            }
+
+            /* 툴팁 크기 조정 */
+            .nav-icon::after {
+                font-size: 1rem !important;
+                padding: 0.6rem 1.2rem !important;
+            }
+
             </style>
         """, unsafe_allow_html=True)
 
