@@ -18,8 +18,6 @@ def set_custom_style():
             {
                 background: linear-gradient(135deg, #1A1B1E 25%, #2C2F33 75%);
                 color: #EAEAEA;
-                max-width: 1200px;
-                margin: 0 auto;
             }
         """
     ):
@@ -234,9 +232,6 @@ def set_custom_style():
                 flex-direction: column;
                 height: calc(100vh - 200px);
                 margin-bottom: 20px;
-                max-width: 1200px;
-                margin-left: auto;
-                margin-right: auto;
             }
 
             .messages-container {
@@ -249,10 +244,8 @@ def set_custom_style():
             .input-container {
                 position: fixed;
                 bottom: 0;
-                left: 50%;
-                transform: translateX(-50%);
-                width: 100%;
-                max-width: 1200px;
+                left: 0;
+                right: 0;
                 background: rgba(26, 27, 30, 0.95);
                 padding: 20px;
                 backdrop-filter: blur(10px);
@@ -279,10 +272,8 @@ def set_custom_style():
             .nav-container {
                 position: fixed !important;
                 top: 0 !important;
-                left: 50% !important;
-                transform: translateX(-50%) !important;
-                width: 100% !important;
-                max-width: 1200px !important;
+                left: 0 !important;
+                right: 0 !important;
                 height: 60px !important;
                 background-color: #FF5722 !important;
                 display: flex !important;
