@@ -1,28 +1,36 @@
-import streamlit as st 
+import streamlit as st
 from openai import OpenAI
 import requests
 import json
-from typing import Dict, List, Optional
+from typing import Dict
 import time
 import random
 import io
 import base64
 from PIL import Image
 
+# 이미지 로딩 최적화를 위한 캐싱
+@st.cache_data
+def load_image(url):
+    try:
+        return Image.open(requests.get(url, stream=True).raw)
+    except Exception as e:
+        st.error(f"이미지 로딩 중 오류 발생: {str(e)}")
+        return None
 
+# 스타일 설정을 별도로 분리하여 관리
 def set_custom_style():
     st.markdown("""
         <style>
-        /* 기본 테마 */
+        /* 라이트 테마 */
         .stApp {
-            background: linear-gradient(135deg, #1A1B1E 25%, #2C2F33 75%);
-            color: #EAEAEA;
+            background: linear-gradient(135deg, #FFFFFF 25%, #F8F9FA 75%);
+            color: #2C3E50;
         }
-        
         /* 네비게이션 컨테이너 */
         .nav-container {
             position: fixed;
-            top: 4.5rem;  /* Streamlit 헤더 고려 */
+            top: 4.5rem;
             right: 20px;
             z-index: 1000;
             display: flex;
@@ -37,22 +45,23 @@ def set_custom_style():
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.9);
             border-radius: 50%;
             cursor: pointer;
             transition: all 0.3s ease;
             backdrop-filter: blur(10px);
             font-size: 1.2rem;
             text-decoration: none;
-            color: rgba(255, 255, 255, 0.8);
+            color: #2C3E50;
             position: relative;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(44, 62, 80, 0.1);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
         .nav-icon:hover {
-            background: rgba(255, 75, 75, 0.2);
+            background: rgba(52, 152, 219, 0.1);
             transform: translateY(-2px);
-            border-color: rgba(255, 75, 75, 0.3);
+            border-color: rgba(52, 152, 219, 0.3);
         }
 
         /* 툴팁 */
@@ -62,7 +71,7 @@ def set_custom_style():
             right: 50px;
             top: 50%;
             transform: translateY(-50%);
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(44, 62, 80, 0.9);
             color: white;
             padding: 0.5rem 1rem;
             border-radius: 4px;
@@ -82,57 +91,57 @@ def set_custom_style():
         
         /* 채팅 인터페이스 */
         .stChatMessage {
-            background: rgba(255, 255, 255, 0.05) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.95) !important;
+            border: 1px solid rgba(44, 62, 80, 0.1);
             border-radius: 8px;
             padding: 1rem;
             margin: 1rem 0;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
         
         .stChatMessage:hover {
-            border-color: rgba(255, 75, 75, 0.2);
+            border-color: rgba(52, 152, 219, 0.3);
         }
         
         /* 입력 필드 */
         .stTextInput > div > div > input {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(44, 62, 80, 0.1);
             padding: 0.8rem 1rem;
             border-radius: 6px;
-            color: white;
+            color: #2C3E50;
             width: calc(100% - 2rem);
             margin: 0 auto;
         }
         
         .stTextInput > div > div > input:focus {
-            border-color: #FF4B4B;
-            box-shadow: 0 0 0 1px rgba(255, 75, 75, 0.3);
+            border-color: #3498DB;
+            box-shadow: 0 0 0 1px rgba(52, 152, 219, 0.3);
         }
         
         /* 프로그레스 바 */
         .stProgress > div > div {
-            background: linear-gradient(90deg, #1DB954, #1ED760) !important;
+            background: linear-gradient(90deg, #3498DB, #2980B9) !important;
         }
         
         .stProgress {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(44, 62, 80, 0.1);
         }
         
         /* 캡션과 설명 텍스트 */
         .header-subtitle {
-            color: rgba(255, 255, 255, 0.7);
+            color: #7F8C8D;
             font-size: 1.1rem;
             margin-bottom: 2rem;
         }
         
         .intro-text {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.95);
             padding: 1.5rem;
             border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(44, 62, 80, 0.1);
             margin: 1rem 0 2rem 0;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
         
         /* 이미지 스타일 */
@@ -140,22 +149,26 @@ def set_custom_style():
             margin: 1rem 0;
             transition: all 0.3s ease;
             position: relative;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            background: white;
+            padding: 0.5rem;
+            border-radius: 8px;
         }
         
         .image-container img {
             width: 100%;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            border: 1px solid rgba(44, 62, 80, 0.1);
         }
         
         .image-container:hover {
             transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
         
         .image-caption {
             text-align: center;
-            color: rgba(255, 255, 255, 0.7);
+            color: #7F8C8D;
             margin-top: 0.5rem;
             font-size: 0.9rem;
         }
@@ -176,8 +189,8 @@ def set_custom_style():
         }
 
         .overlay-button {
-            background: rgba(0, 0, 0, 0.6);
-            color: white;
+            background: rgba(255, 255, 255, 0.9);
+            color: #2C3E50;
             border: none;
             padding: 0.5rem;
             border-radius: 50%;
@@ -186,11 +199,13 @@ def set_custom_style():
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.3s ease;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
         .overlay-button:hover {
-            background: rgba(255, 75, 75, 0.8);
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498DB;
         }
 
         /* Streamlit 기본 요소 조정 */
@@ -199,106 +214,119 @@ def set_custom_style():
         }
         
         header[data-testid="stHeader"] {
-            background: rgba(26, 27, 30, 0.9);
+            background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(44, 62, 80, 0.1);
         }
 
         .main > div:first-child {
-            padding-top: 5rem !important;  /* 상단 여백 추가 */
+            padding-top: 5rem !important;
+        }
+        
+        /* 취소 버튼 스타일 */
+        .cancel-button {
+            background-color: #E74C3C;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .cancel-button:hover {
+            background-color: #C0392B;
         }
         
         </style>
     """, unsafe_allow_html=True)
 
-def typewriter_effect(text: str, speed: float = 0.03):
-    """텍스트를 타이핑 효과로 표시"""
-    message_placeholder = st.empty()
-    full_text = ""
-    for char in text:
-        full_text += char
-        message_placeholder.markdown(full_text + "▌")
-        time.sleep(speed)
-    message_placeholder.markdown(full_text)
-    return message_placeholder
+class OpenAIClient:
+    def __init__(self, api_key: str):
+        self.client = OpenAI(api_key=api_key)
 
-def confetti_effect():
-    """스트림릿에서 confetti 효과를 표시"""
-    st.markdown("""
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
-    <script>
-    const duration = 5 * 1000;
-    const end = Date.now() + duration;
+    def create_assistant(self, instructions: str, model: str, tools: list):
+        try:
+            return self.client.beta.assistants.create(
+                name="SF49 Studio Designer",
+                instructions=instructions,
+                model=model,
+                tools=tools
+            )
+        except Exception as e:
+            st.error(f"Assistant 생성 중 오류 발생: {str(e)}")
+            return None
 
-    (function frame() {
-      confetti({
-        particleCount: 3,
-        angle: 60,
-        spread: 55,
-        origin: { x: 0 }
-      });
-      confetti({
-        particleCount: 3,
-        angle: 120,
-        spread: 55,
-        origin: { x: 1 }
-      });
+class WebhookHandler:
+    def __init__(self, base_url: str, send_webhook: str, retrieve_webhook: str):
+        self.base_url = base_url
+        self.send_webhook = send_webhook
+        self.retrieve_webhook = retrieve_webhook
 
-      if (Date.now() < end) {
-        requestAnimationFrame(frame);
-      }
-    }());
-    </script>
-    """, unsafe_allow_html=True)
+    def send_image_data(self, visualization_text: str, unique_id: str) -> Dict:
+        try:
+            url = f"{self.base_url}{self.send_webhook}"
+            payload = {
+                "imageData": visualization_text,
+                "uniqueId": unique_id
+            }
+            response = requests.post(url, json=payload, timeout=10)
+            response.raise_for_status()
+            return {
+                "success": True,
+                "message": "이미지 생성이 시작되었습니다",
+                "unique_id": unique_id
+            }
+        except requests.exceptions.RequestException as e:
+            return {
+                "success": False,
+                "message": f"이미지 생성 요청 중 오류가 발생했습니다: {str(e)}",
+                "unique_id": unique_id
+            }
 
-def fireworks_effect():
-    """스트림릿에서 불꽃놀이 효과를 표시"""
-    st.markdown("""
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
-    <script>
-    const duration = 5 * 1000;
-    const animationEnd = Date.now() + duration;
-    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
-
-    function randomInRange(min, max) {
-      return Math.random() * (max - min) + min;
-    }
-
-    (function frame() {
-      const timeLeft = animationEnd - Date.now();
-
-      if (timeLeft <= 0) {
-        return;
-      }
-
-      const particleCount = 50 * (timeLeft / duration);
-      confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
-      confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
-
-      requestAnimationFrame(frame);
-    }());
-    </script>
-    """, unsafe_allow_html=True)
+    def get_image_links(self, unique_id: str) -> Dict:
+        try:
+            url = f"{self.base_url}{self.retrieve_webhook}"
+            payload = {"uniqueId": unique_id}
+            response = requests.post(url, json=payload, timeout=10)
+            response.raise_for_status()
+            result = response.json()
+            if "images" in result and isinstance(result["images"], list) and len(result["images"]) > 0:
+                return {
+                    "success": True,
+                    "images": result["images"],
+                    "message": "이미지가 성공적으로 생성되었습니다!"
+                }
+            else:
+                return {
+                    "success": False,
+                    "images": [],
+                    "message": "이미지가 아직 준비되지 않았습니다."
+                }
+        except requests.exceptions.RequestException as e:
+            return {
+                "success": False,
+                "images": [],
+                "message": f"이미지 조회 중 오류가 발생했습니다: {str(e)}"
+            }
 
 class SF49StudioAssistant:
-    def __init__(self, api_key: str):
-        self.client = OpenAI(api_key=st.secrets["openai_api_key"])
+    def __init__(self, openai_client: OpenAIClient, webhook_handler: WebhookHandler):
+        self.client = openai_client
+        self.webhook_handler = webhook_handler
         self.assistant = None
         self.thread = None
-        self.webhook_base_url = "https://hook.eu2.make.com"
-        self.send_webhook = "/l1b22zor5v489mjyc6mgr8ybwliq763v"
-        self.retrieve_webhook = "/7qia4xlc2hvxt1qs1yr5eh7g9nqs8brd"
-        
+
     def create_assistant(self):
-        """SF49 Studio Assistant 생성 및 상세 지침 설정"""
-        self.assistant = self.client.beta.assistants.create(
-            name="SF49 Studio Designer",
-            instructions="""
-            당신의 목적은 한국어로 대화하면서 이미지 생성을 처리하는 것입니다.
-            당신은 SF49 Studio의 전문 디자이너처럼 행동합니다.
-            창의적인 디자이너의 관점과 전문적이고 세련된 언어를 사용하며, 전문가의 톤을 유지합니다.
-            모든 커뮤니케이션에서 명확성, 디자인적 미적 감각, 그리고 전문성을 우선시합니다.
-            """,
-            model="gpt-4o-mini",
+        instructions = """
+        당신의 목적은 한국어로 대화하면서 이미지 생성을 처리하는 것입니다.
+        당신은 SF49 Studio의 전문 디자이너처럼 행동합니다.
+        창의적인 디자이너의 관점과 전문적이고 세련된 언어를 사용하며, 전문가의 톤을 유지합니다.
+        모든 커뮤니케이션에서 명확성, 디자인적 미적 감각, 그리고 전문성을 우선시합니다.
+        """
+        self.assistant = self.client.create_assistant(
+            instructions=instructions,
+            model="gpt-4-1106-preview",
             tools=[{
                 "type": "function",
                 "function": {
@@ -323,241 +351,173 @@ class SF49StudioAssistant:
         )
         return self.assistant
 
-    def create_thread(self):
-        """새로운 대화 스레드 생성"""
-        self.thread = self.client.beta.threads.create()
-        return self.thread
-
-    def send_image_data(self, visualization_text: str, unique_id: str) -> Dict:
-        """이미지 생성 요청 전송 및 결과 확인"""
-        url = f"{self.webhook_base_url}{self.send_webhook}"
-        payload = {
-            "imageData": visualization_text,
-            "uniqueId": unique_id
-        }
-        
-        try:
-            response = requests.post(url, json=payload, timeout=10)
-            response.raise_for_status()
-            return {
-                "success": True,
-                "message": "이미지 생성이 시작되었습니다",
-                "unique_id": unique_id
-            }
-        except requests.exceptions.RequestException as e:
-            return {
-                "success": False,
-                "message": f"이미지 생성 요청 중 오류가 발생했습니다: {str(e)}",
-                "unique_id": unique_id
-            }
-
-    def get_image_links(self, unique_id: str) -> Dict:
-        """이미지 URL 목록 조회"""
-        url = f"{self.webhook_base_url}{self.retrieve_webhook}"
-        payload = {"uniqueId": unique_id}
-        
-        try:
-            response = requests.post(url, json=payload, timeout=10)
-            response.raise_for_status()
-            result = response.json()
-            
-            if "images" in result and isinstance(result["images"], list) and len(result["images"]) > 0:
-                return {
-                    "success": True,
-                    "images": result["images"],
-                    "message": "이미지가 성공적으로 생성되었습니다!"
-                }
-            else:
-                return {
-                    "success": False,
-                    "images": [],
-                    "message": "이미지가 아직 준비되지 않았습니다."
-                }
-        except requests.exceptions.RequestException as e:
-            return {
-                "success": False,
-                "images": [],
-                "message": f"이미지 조회 중 오류가 발생했습니다: {str(e)}"
-            }
-
     def process_message(self, user_message: str) -> Dict:
-        """사용자 메시지 처리 및 응답 생성"""
-        if self.thread is None:
-            self.create_thread()
+        try:
+            if self.thread is None:
+                self.create_thread()
 
-        self.client.beta.threads.messages.create(
-            thread_id=self.thread.id,
-            role="user",
-            content=user_message
-        )
+            if 'cancel_generation' in st.session_state:
+                del st.session_state.cancel_generation
 
-        run = self.client.beta.threads.runs.create(
-            thread_id=self.thread.id,
-            assistant_id=self.assistant.id
-        )
-
-        generated_id = None
-        status_container = st.empty()
-
-        while True:
-            run = self.client.beta.threads.runs.retrieve(
+            self.client.client.beta.threads.messages.create(
                 thread_id=self.thread.id,
-                run_id=run.id
+                role="user",
+                content=user_message
             )
 
-            if run.status == "requires_action":
-                tool_outputs = []
-                for tool_call in run.required_action.submit_tool_outputs.tool_calls:
-                    args = json.loads(tool_call.function.arguments)
-                    
-                    if tool_call.function.name == "send_image_request":
-                        result = self.send_image_data(
-                            args["visualization_text"],
-                            args["unique_id"]
-                        )
-                        generated_id = result["unique_id"]
+            run = self.client.client.beta.threads.runs.create(
+                thread_id=self.thread.id,
+                assistant_id=self.assistant.id
+            )
+
+            generated_id = None
+            status_container = st.empty()
+            
+            cancel_button = st.button("생성 취소", key="cancel_generation", 
+                                    help="이미지 생성을 취소합니다")
+
+            while True:
+                if cancel_button or ('cancel_generation' in st.session_state and 
+                                   st.session_state.cancel_generation):
+                    self.client.client.beta.threads.runs.cancel(
+                        thread_id=self.thread.id,
+                        run_id=run.id
+                    )
+                    return {
+                        "status": "cancelled",
+                        "response": "이미지 생성이 취소되었습니다."
+                    }
+
+                run = self.client.client.beta.threads.runs.retrieve(
+                    thread_id=self.thread.id,
+                    run_id=run.id
+                )
+
+                if run.status == "requires_action":
+                    tool_outputs = []
+                    for tool_call in run.required_action.submit_tool_outputs.tool_calls:
+                        args = json.loads(tool_call.function.arguments)
                         
-                        if not result["success"]:
-                            typewriter_effect(result["message"])
+                        if tool_call.function.name == "send_image_request":
+                            result = self.webhook_handler.send_image_data(
+                                args["visualization_text"],
+                                args["unique_id"]
+                            )
+                            generated_id = result["unique_id"]
+                            
+                            if not result["success"]:
+                                return {
+                                    "status": "error",
+                                    "response": result["message"]
+                                }
+
+                            response_data = {
+                                "status": "success",
+                                "unique_id": generated_id,
+                                "message": "이미지 생성을 시작합니다..."
+                            }
+                            tool_outputs.append({
+                                "tool_call_id": tool_call.id,
+                                "output": json.dumps(response_data)
+                            })
+
+                    run = self.client.client.beta.threads.runs.submit_tool_outputs(
+                        thread_id=self.thread.id,
+                        run_id=run.id,
+                        tool_outputs=tool_outputs
+                    )
+
+                    if generated_id:
+                        progress_messages = [
+                            "이미지 생성을 위한 초기 설정을 준비하고 있습니다...",
+                            "아이디어를 시각적 요소로 분석하고 있습니다...",
+                            "디자인 요소를 구성하고 있습니다...",
+                            "이미지의 세부 요소를 조정하고 있습니다...",
+                            "최종 디테일을 다듬고 있습니다...",
+                            "생성된 이미지를 최적화하고 있습니다..."
+                        ]
+                        
+                        my_bar = st.progress(0)
+                        
+                        for i in range(100):
+                            if ('cancel_generation' in st.session_state and 
+                                st.session_state.cancel_generation):
+                                my_bar.empty()
+                                status_container.empty()
+                                return {
+                                    "status": "cancelled",
+                                    "response": "이미지 생성이 취소되었습니다."
+                                }
+
+                            if i % 20 == 0:
+                                progress_text = random.choice(progress_messages)
+                                status_container.markdown(f"**{progress_text}**")
+                            progress_value = (i + 1) / 100
+                            my_bar.progress(progress_value)
+                            time.sleep(0.5)
+
+                        my_bar.empty()
+                        status_container.empty()
+
+                        result = self.webhook_handler.get_image_links(generated_id)
+                        if result["success"] and result["images"]:
+                            st.balloons()
+                            return {
+                                "status": "success",
+                                "response": "✨ 디자인이 완성되었습니다! 마음에 드시는 결과물이 있으신가요?",
+                                "images": result["images"]
+                            }
+                        else:
                             return {
                                 "status": "error",
-                                "response": result["message"]
+                                "response": "🎨 이미지 생성에 시간이 더 필요합니다. 잠시 후에 다시 시도해 주시겠어요?"
                             }
 
-                        response_data = {
-                            "status": "success",
-                            "unique_id": generated_id,
-                            "message": "이미지 생성을 시작합니다..."
-                        }
-                        tool_outputs.append({
-                            "tool_call_id": tool_call.id,
-                            "output": json.dumps(response_data)
-                        })
+                elif run.status == "completed":
+                    messages = self.client.client.beta.threads.messages.list(
+                        thread_id=self.thread.id
+                    )
+                    return {
+                        "status": "success",
+                        "response": messages.data[0].content[0].text.value
+                    }
 
-                run = self.client.beta.threads.runs.submit_tool_outputs(
-                    thread_id=self.thread.id,
-                    run_id=run.id,
-                    tool_outputs=tool_outputs
-                )
+                elif run.status == "failed":
+                    return {
+                        "status": "error",
+                        "response": "처리 중 문제가 발생했습니다. 다시 시도해주세요."
+                    }
+                
+                time.sleep(0.5)
 
-                if generated_id:
-                    progress_messages = [
-                        "이미지 생성을 위한 초기 설정을 준비하고 있습니다...",
-                        "아이디어를 시각적 요소로 분석하고 있습니다...",
-                        "디자인 요소를 구성하고 있습니다...",
-                        "이미지의 세부 요소를 조정하고 있습니다...",
-                        "최종 디테일을 다듬고 있습니다...",
-                        "생성된 이미지를 최적화하고 있습니다..."
-                    ]
-                    
-                    my_bar = st.progress(0)
-                    
-                    for i in range(100):
-                        if i % 20 == 0:
-                            progress_text = random.choice(progress_messages)
-                            status_container.markdown(f"**{progress_text}**")
-                        progress_value = (i + 1) / 100
-                        my_bar.progress(progress_value)
-                        time.sleep(1)
-
-                    my_bar.empty()
-                    status_container.empty()
-
-                    result = self.get_image_links(generated_id)
-                    if result["success"] and result["images"]:
-                        st.balloons()
-                        confetti_effect()
-                        fireworks_effect()
-                        return {
-                            "status": "success",
-                            "response": "✨ 디자인이 완성되었습니다! 마음에 드시는 결과물이 있으신가요?",
-                            "images": result["images"]
-                        }
-                    else:
-                        return {
-                            "status": "error",
-                            "response": "🎨 이미지 생성에 시간이 더 필요합니다. 잠시 후에 다시 시도해 주시겠어요?"
-                        }
-
-            elif run.status == "completed":
-                messages = self.client.beta.threads.messages.list(
-                    thread_id=self.thread.id
-                )
-                return {
-                    "status": "success",
-                    "response": messages.data[0].content[0].text.value
-                }
-
-            elif run.status == "failed":
-                return {
-                    "status": "error",
-                    "response": "처리 중 문제가 발생했습니다. 다시 시도해주세요."
-                }
-            
-            time.sleep(0.5)
-
-def initialize_session_state():
-    """세션 상태 초기화"""
-    if 'assistant' not in st.session_state:
-        api_key = st.secrets["OPENAI_API_KEY"]
-        st.session_state.assistant = SF49StudioAssistant(api_key)
-        st.session_state.assistant.create_assistant()
-    
-    if 'messages' not in st.session_state:
-        st.session_state.messages = []
-    
-    if 'threads' not in st.session_state:
-        st.session_state.threads = []
+        except Exception as e:
+            st.error(f"예상치 못한 오류가 발생했습니다: {str(e)}")
+            return {
+                "status": "error",
+                "response": "서비스 처리 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요."
+            }
 
 def main():
-    initialize_session_state()
-
     st.set_page_config(
         page_title="SF49 Studio Designer",
-        page_icon="🎨",
+        page_icon="🌟",
         layout="wide",
         initial_sidebar_state="expanded"
     )
 
     set_custom_style()
 
-    # 상단 여백
-    st.markdown('<div style="margin-top: 1rem;"></div>', unsafe_allow_html=True)
-
-    # 플로팅 네비게이션
-    st.markdown("""
-        <div class="nav-container">
-            <a href="https://sf49.studio/" 
-               target="_blank" 
-               class="nav-icon"
-               data-tooltip="SF49 Studio">
-                🏠
-            </a>
-            <a href="https://sf49.studio/guide" 
-               target="_blank" 
-               class="nav-icon"
-               data-tooltip="이용 가이드">
-                📖
-            </a>
-            <a href="https://sf49.studio/pricing" 
-               target="_blank" 
-               class="nav-icon"
-               data-tooltip="요금제 안내">
-                💳
-            </a>
-            <a href="https://sf49.studio/contact" 
-               target="_blank" 
-               class="nav-icon"
-               data-tooltip="문의하기">
-                ✉️
-            </a>
-        </div>
-    """, unsafe_allow_html=True)
+    openai_client = OpenAIClient(api_key=st.secrets["openai_api_key"])
+    webhook_handler = WebhookHandler(
+        base_url="https://hook.eu2.make.com",
+        send_webhook="/l1b22zor5v489mjyc6mgr8ybwliq763v",
+        retrieve_webhook="/7qia4xlc2hvxt1qs1yr5eh7g9nqs8brd"
+    )
+    assistant = SF49StudioAssistant(openai_client, webhook_handler)
 
     st.title("SF49 Studio Designer")
     st.markdown('<p class="header-subtitle">AI 디자인 스튜디오</p>', unsafe_allow_html=True)
-    
-    # 설명 텍스트 (항상 말풍선으로 표시)
+
     if 'shown_intro' not in st.session_state:
         with st.chat_message("assistant"):
             st.markdown("""
@@ -569,6 +529,9 @@ def main():
     chat_container = st.container()
     
     with chat_container:
+        if 'messages' not in st.session_state:
+            st.session_state.messages = []
+        
         for message in st.session_state.messages:
             with st.chat_message(message["role"]):
                 st.markdown(message["content"])
@@ -577,58 +540,72 @@ def main():
                     cols = st.columns(2)
                     for idx, url in enumerate(message["image_urls"]):
                         with cols[idx % 2]:
-                            buffer = io.BytesIO()
-                            img = Image.open(requests.get(url, stream=True).raw)
-                            img.save(buffer, format="PNG")
-                            img_base64 = base64.b64encode(buffer.getvalue()).decode()
-                            st.markdown(f"""
-                                <div class="image-container">
-                                    <img src="{url}">
-                                    <div class="overlay-buttons">
-                                        <a href="data:image/png;base64,{img_base64}" download="Design_Option_{idx + 1}.png" class="overlay-button" title="이미지 다운로드">💾</a>
-                                        <a href="{url}" target="_blank" class="overlay-button" title="크게 보기">🔍</a>
+                            image = load_image(url)
+                            if image:
+                                buffer = io.BytesIO()
+                                image.save(buffer, format="PNG")
+                                img_base64 = base64.b64encode(buffer.getvalue()).decode()
+                                st.markdown(f"""
+                                    <div class="image-container">
+                                        <img src="{url}">
+                                        <div class="overlay-buttons">
+                                            <a href="data:image/png;base64,{img_base64}" 
+                                               download="Design_Option_{idx + 1}.png" 
+                                               class="overlay-button" 
+                                               title="이미지 다운로드">💾</a>
+                                            <a href="{url}" 
+                                               target="_blank" 
+                                               class="overlay-button" 
+                                               title="크게 보기">🔍</a>
+                                        </div>
+                                        <p class="image-caption">Design Option {idx + 1}</p>
                                     </div>
-                                    <p class="image-caption">Design Option {idx + 1}</p>
-                                </div>
-                            """, unsafe_allow_html=True)
-                            
+                                """, unsafe_allow_html=True)
+
     if prompt := st.chat_input("어떤 이미지를 만들어드릴까요?"):
-        # 사용자 텍스트는 즉시 표시
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
             st.markdown(prompt)
 
-        # AI 응답은 타이핑 효과로 표시
-        response = st.session_state.assistant.process_message(prompt)
         with st.chat_message("assistant"):
+            response = assistant.process_message(prompt)
+            
             if response["status"] == "success":
-                typewriter_effect(response["response"], speed=0.02)
+                st.markdown(response["response"])
                 message = {"role": "assistant", "content": response["response"]}
                 
-                # 이미지 URL이 있으면 해당 URL도 표시
                 if "images" in response and response["images"]:
                     message["image_urls"] = response["images"]
                     cols = st.columns(2)
                     for idx, url in enumerate(response["images"]):
                         with cols[idx % 2]:
-                            buffer = io.BytesIO()
-                            img = Image.open(requests.get(url, stream=True).raw)
-                            img.save(buffer, format="PNG")
-                            img_base64 = base64.b64encode(buffer.getvalue()).decode()
-                            st.markdown(f"""
-                                <div class="image-container">
-                                    <img src="{url}">
-                                    <div class="overlay-buttons">
-                                        <a href="data:image/png;base64,{img_base64}" download="Design_Option_{idx + 1}.png" class="overlay-button" title="이미지 다운로드">💾</a>
-                                        <a href="{url}" target="_blank" class="overlay-button" title="크게 보기">🔍</a>
+                            image = load_image(url)
+                            if image:
+                                buffer = io.BytesIO()
+                                image.save(buffer, format="PNG")
+                                img_base64 = base64.b64encode(buffer.getvalue()).decode()
+                                st.markdown(f"""
+                                    <div class="image-container">
+                                        <img src="{url}">
+                                        <div class="overlay-buttons">
+                                            <a href="data:image/png;base64,{img_base64}" 
+                                               download="Design_Option_{idx + 1}.png" 
+                                               class="overlay-button" 
+                                               title="이미지 다운로드">💾</a>
+                                            <a href="{url}" 
+                                               target="_blank" 
+                                               class="overlay-button" 
+                                               title="크게 보기">🔍</a>
+                                        </div>
+                                        <p class="image-caption">Design Option {idx + 1}</p>
                                     </div>
-                                    <p class="image-caption">Design Option {idx + 1}</p>
-                                </div>
-                            """, unsafe_allow_html=True)
+                                """, unsafe_allow_html=True)
                 
                 st.session_state.messages.append(message)
+            elif response["status"] == "cancelled":
+                st.warning(response["response"])
             else:
-                typewriter_effect(response["response"], speed=0.02)
+                st.error(response["response"])
 
 if __name__ == "__main__":
     main()
