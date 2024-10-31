@@ -10,7 +10,6 @@ import base64
 from PIL import Image
 from streamlit_extras.stylable_container import stylable_container
 
-
 def apply_custom_css():
     # 메인 컨테이너 스타일
     st.markdown("""
@@ -207,6 +206,11 @@ def apply_custom_css():
         }
 
         /* 이미지 오버레이 버튼 */
+        .image-container {
+            position: relative;
+            overflow: hidden;
+        }
+
         .image-container .overlay-buttons {
             position: absolute;
             top: 10px;
@@ -215,6 +219,7 @@ def apply_custom_css():
             gap: 0.5rem;
             opacity: 0;
             transition: opacity 0.3s ease;
+            z-index: 100;
         }
 
         .image-container:hover .overlay-buttons {
@@ -225,7 +230,8 @@ def apply_custom_css():
             background: rgba(0, 0, 0, 0.6);
             color: white;
             border: none;
-            padding: 0.5rem;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             cursor: pointer;
             font-size: 1.2rem;
@@ -233,10 +239,12 @@ def apply_custom_css():
             align-items: center;
             justify-content: center;
             transition: background 0.3s ease;
+            text-decoration: none;
         }
 
         .overlay-button:hover {
-            background: rgba(255, 75, 75, 0.8);
+            background: rgba(0, 0, 0, 0.8);
+            transform: translateY(-2px);
         }
 
         /* 이미지 캡션 */
@@ -700,7 +708,7 @@ def main():
     ):
         # 인트로 메시지
         if 'shown_intro' not in st.session_state:
-            with st.chat_message("assistant"):
+            with st.chat_message("assistant", avatar="🎨"):
                 st.markdown("""
                     <div style='color: #1F2937;'>
                         <h3 style='margin: 0 0 0.5rem 0; font-weight: 600;'>환영합니다! 👋</h3>
@@ -742,6 +750,7 @@ def main():
                                         border: 1px solid #E2E8F0;
                                         transition: transform 0.2s ease;
                                         max-width: 600px;
+                                        position: relative;
                                     }
                                     :hover {
                                         transform: translateY(-2px);
@@ -753,6 +762,41 @@ def main():
                                     if image:
                                         st.image(image, use_column_width=True)
                                         
+                                        # 오버레이 버튼
+                                        st.markdown(f"""
+                                            <div class="overlay-buttons">
+                                                <a href="data:image/png;base64,{base64.b64encode(io.BytesIO().getvalue()).decode()}" 
+                                                   download="SF49_Design_{idx + 1}.png" 
+                                                   class="overlay-button">
+                                                    💾
+                                                </a>
+                                                <a href="{url}" 
+                                                   target="_blank" 
+                                                   class="overlay-button">
+                                                    🔍
+                                                </a>
+                                            </div>
+                                        """, unsafe_allow_html=True)
+
+            # 채팅 입력
+            if prompt := st.chat_input("어떤 이미지를 만들어드릴까요?"):
+                st.session_state.messages.append({"role": "user", "content": prompt})
+                
+                with st.chat_message("user", avatar="😊"):
+                    st.markdown(prompt)
+
+                response = assistant.process_message(prompt)
+                
+                if response["status"] == "success":
+                    with st.chat_message("assistant", avatar="🎨"):
+                        st.markdown(response["response"])
+                        message = {"role": "assistant", "content": response["response"]}
+                        
+                        if "images" in response and response["images"]:
+                            message["image_urls"] = response["images"]
+                            cols = st.columns(2)
+                            for idx, url in enumerate(response["images"]):
+                                with cols[idx % 2]:
                                         col1, col2 = st.columns(2)
                                         with col1:
                                             with stylable_container(
