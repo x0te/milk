@@ -40,38 +40,47 @@ def set_custom_style():
             
             /* 네비게이션 컨테이너 */
             .nav-container {
-                position: fixed;
-                top: 4.5rem;  /* Streamlit 헤더 고려 */
-                right: 20px;
-                z-index: 1000;
-                display: flex;
-                gap: 0.5rem;
-                background: transparent;
+                max-width: 1200px !important;
+                width: 100% !important;
+                padding: 0 20px !important;
+                box-sizing: border-box !important;
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                height: 60px !important;
+                background-color: #FF5722 !important;
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+                z-index: 999999 !important;
             }
 
             /* 아이콘 버튼 */
             .nav-icon {
-                width: 40px;
-                height: 40px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                background: rgba(255, 255, 255, 0.1);
-                border-radius: 50%;
-                cursor: pointer;
-                transition: all 0.3s ease;
-                backdrop-filter: blur(10px);
-                font-size: 1.2rem;
-                text-decoration: none;
-                color: rgba(255, 255, 255, 0.8);
-                position: relative;
-                border: 1px solid rgba(255, 255, 255, 0.1);
+                width: 40px !important;
+                height: 40px !important;
+                font-size: 1.5rem !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                margin: 0 10px !important;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                position: relative !important;
+                transform-origin: center bottom !important;
             }
 
             .nav-icon:hover {
-                background: rgba(255, 75, 75, 0.2);
-                transform: translateY(-2px);
-                border-color: rgba(255, 75, 75, 0.3);
+                background: rgb(36, 37, 39) !important;
+                border-radius: 50% !important;
+                transform: scale(1.2) translateY(-5px) !important;
+            }
+
+            .nav-icon:hover + .nav-icon {
+                transform: scale(1.1) translateY(-3px) !important;
+            }
+
+            .nav-icon:hover ~ .nav-icon {
+                transform: scale(1.05) translateY(-2px) !important;
             }
 
             /* 툴팁 */
@@ -91,12 +100,32 @@ def set_custom_style():
                 visibility: hidden;
                 transition: all 0.3s ease;
                 backdrop-filter: blur(10px);
+                top: 65px !important;
+                transition: all 0.3s ease !important;
+                opacity: 0 !important;
             }
 
             .nav-icon:hover::after {
-                opacity: 1;
-                visibility: visible;
-                right: 45px;
+                opacity: 1 !important;
+                transform: translateY(5px) !important;
+            }
+
+            /* 반사 효과 추가 */
+            .nav-icon::before {
+                content: '' !important;
+                position: absolute !important;
+                bottom: -5px !important;
+                left: 50% !important;
+                transform: translateX(-50%) !important;
+                width: 100% !important;
+                height: 4px !important;
+                background: radial-gradient(ellipse at center, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 60%) !important;
+                opacity: 0 !important;
+                transition: opacity 0.3s ease !important;
+            }
+
+            .nav-icon:hover::before {
+                opacity: 1 !important;
             }
             
             /* 채팅 인터페이스 */
