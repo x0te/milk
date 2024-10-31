@@ -212,7 +212,6 @@ def set_custom_style():
             }
             
             header[data-testid="stHeader"] {
-                display: none !important;  /* 헤더 숨기기 */
                 background: rgba(26, 27, 30, 0.9);
                 backdrop-filter: blur(10px);
             }
@@ -252,28 +251,6 @@ def set_custom_style():
                 backdrop-filter: blur(10px);
                 border-top: 1px solid rgba(255, 255, 255, 0.1);
                 z-index: 1000;
-            }
-            
-            /* 미드 센츄리 스타일 헤더 */
-            .midcentury-header {
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 4px;
-                background: #FF5722;  /* 미드 센츄리 오렌지 */
-                z-index: 1000;
-                box-shadow: 0 2px 4px rgba(255, 87, 34, 0.2);
-            }
-
-            /* 기존 Streamlit 헤더 숨기기 */
-            header[data-testid="stHeader"] {
-                display: none !important;
-            }
-
-            /* 컨텐츠 상단 여백 조정 */
-            .main > div:first-child {
-                padding-top: 1rem !important;
             }
             
             </style>
@@ -445,7 +422,7 @@ class SF49StudioAssistant:
                 return {
                     "success": True,
                     "images": result["images"],
-                    "message": "이미지가 성공���으로 생성되었습니다!"
+                    "message": "이미지가 성공적으로 생성되었습니다!"
                 }
             else:
                 return {
