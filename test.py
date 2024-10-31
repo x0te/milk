@@ -748,7 +748,7 @@ def main():
                                         border-radius: 8px;
                                         margin: 0.75rem auto;
                                         border: 1px solid #E2E8F0;
-                                        transition: transform 0.2s ease;
+                                        transition: all 0.2s ease;
                                         max-width: 600px;
                                         position: relative;
                                     }
@@ -756,47 +756,29 @@ def main():
                                         transform: translateY(-2px);
                                         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
                                     }
+                                    img {
+                                        width: 100%;
+                                        height: auto;
+                                        display: block;
+                                    }
+                                    .overlay-buttons {
+                                        position: absolute;
+                                        top: 1rem;
+                                        right: 1rem;
+                                        display: flex;
+                                        gap: 0.5rem;
+                                        opacity: 0;
+                                        transition: opacity 0.3s ease;
+                                    }
+                                    :hover .overlay-buttons {
+                                        opacity: 1;
+                                    }
                                     """
                                 ):
                                     image = load_image(url)
                                     if image:
                                         st.image(image, use_column_width=True)
                                         
-                                        # 오버레이 버튼
-                                        st.markdown(f"""
-                                            <div class="overlay-buttons">
-                                                <a href="data:image/png;base64,{base64.b64encode(io.BytesIO().getvalue()).decode()}" 
-                                                   download="SF49_Design_{idx + 1}.png" 
-                                                   class="overlay-button">
-                                                    💾
-                                                </a>
-                                                <a href="{url}" 
-                                                   target="_blank" 
-                                                   class="overlay-button">
-                                                    🔍
-                                                </a>
-                                            </div>
-                                        """, unsafe_allow_html=True)
-
-            # 채팅 입력
-            if prompt := st.chat_input("어떤 이미지를 만들어드릴까요?"):
-                st.session_state.messages.append({"role": "user", "content": prompt})
-                
-                with st.chat_message("user", avatar="😊"):
-                    st.markdown(prompt)
-
-                response = assistant.process_message(prompt)
-                
-                if response["status"] == "success":
-                    with st.chat_message("assistant", avatar="🎨"):
-                        st.markdown(response["response"])
-                        message = {"role": "assistant", "content": response["response"]}
-                        
-                        if "images" in response and response["images"]:
-                            message["image_urls"] = response["images"]
-                            cols = st.columns(2)
-                            for idx, url in enumerate(response["images"]):
-                                with cols[idx % 2]:
                                         col1, col2 = st.columns(2)
                                         with col1:
                                             with stylable_container(
@@ -812,6 +794,7 @@ def main():
                                                     font-size: 0.875rem;
                                                     font-weight: 500;
                                                     transition: all 0.2s;
+                                                    z-index: 10;
                                                 }
                                                 button:hover {
                                                     background-color: #047857;
@@ -842,6 +825,7 @@ def main():
                                                     font-size: 0.875rem;
                                                     font-weight: 500;
                                                     transition: all 0.2s;
+                                                    z-index: 10;
                                                 }
                                                 button:hover {
                                                     background-color: #1148A0;
@@ -851,7 +835,7 @@ def main():
                                             ):
                                                 st.markdown(f'<a href="{url}" target="_blank"><button style="width:100%;padding:0.75rem;">🔍 크게 보기</button></a>', unsafe_allow_html=True)
 
-            # 채팅 입력
+            # 채팅 입력 (한 번만 선언)
             if prompt := st.chat_input("어떤 이미지를 만들어드릴까요?"):
                 st.session_state.messages.append({"role": "user", "content": prompt})
                 
@@ -881,6 +865,7 @@ def main():
                                             border: 1px solid #E2E8F0;
                                             transition: transform 0.2s ease;
                                             max-width: 600px;
+                                            position: relative;
                                         }
                                         :hover {
                                             transform: translateY(-2px);
@@ -907,6 +892,7 @@ def main():
                                                         font-size: 0.875rem;
                                                         font-weight: 500;
                                                         transition: all 0.2s;
+                                                        z-index: 10;
                                                     }
                                                     button:hover {
                                                         background-color: #047857;
@@ -937,6 +923,7 @@ def main():
                                                         font-size: 0.875rem;
                                                         font-weight: 500;
                                                         transition: all 0.2s;
+                                                        z-index: 10;
                                                     }
                                                     button:hover {
                                                         background-color: #1148A0;
