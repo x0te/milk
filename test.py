@@ -19,6 +19,15 @@ def set_custom_style():
             background: linear-gradient(135deg, #1A1B1E 25%, #2C2F33 75%);
             color: #EAEAEA;
         }
+
+        /* Streamlit 메인 컨테이너 배경색 오버라이드 */
+        .st-emotion-cache-1jicfl2 {
+            background: transparent !important;
+        }
+
+        .st-emotion-cache-bm2z3a {
+            background: transparent !important;
+        }
         
         /* 네비게이션 컨테이너 */
         .nav-container {
