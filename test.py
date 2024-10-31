@@ -22,7 +22,6 @@ def set_custom_style():
         """
     ):
         st.markdown("""
-            <div class="midcentury-header"></div>
             <style>
             /* Streamlit 메인 컨테이너 배경색 오버라이드 */
             .st-emotion-cache-1jicfl2 {
@@ -257,7 +256,7 @@ def set_custom_style():
             
             /* 미드 센츄리 스타일 헤더 */
             .midcentury-header {
-                position: absolute;
+                position: fixed;
                 top: 0;
                 left: 0;
                 right: 0;
@@ -267,65 +266,14 @@ def set_custom_style():
                 box-shadow: 0 2px 4px rgba(255, 87, 34, 0.2);
             }
 
-            /* 메인 컨테이너 조정 */
-            [data-testid="stMainBlockContainer"] {
-                position: relative;
-                padding-top: 4px !important;
-                margin-top: 0 !important;
+            /* 기존 Streamlit 헤더 숨기기 */
+            header[data-testid="stHeader"] {
+                display: none !important;
             }
 
             /* 컨텐츠 상단 여백 조정 */
             .main > div:first-child {
-                padding-top: 0 !important;
-                margin-top: 0 !important;
-            }
-
-            /* Streamlit 기본 헤더 완전히 제거 */
-            header[data-testid="stHeader"] {
-                display: none !important;
-                visibility: hidden !important;
-                height: 0 !important;
-            }
-
-            div[data-testid="stToolbar"] {
-                display: none !important;
-                visibility: hidden !important;
-            }
-
-            div[data-testid="stDecoration"] {
-                display: none !important;
-                visibility: hidden !important;
-            }
-
-            /* 미드 센츄리 스타일 헤더 */
-            .midcentury-header {
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 4px;
-                background: #FF5722;
-                z-index: 1000;
-                box-shadow: 0 2px 4px rgba(255, 87, 34, 0.2);
-            }
-
-            /* 메인 컨테이너 조정 */
-            [data-testid="stMainBlockContainer"] {
-                position: relative;
-                padding-top: 4px !important;
-                margin-top: 0 !important;
-            }
-
-            /* 상단 여백 제거 */
-            .main > div:first-child {
-                padding-top: 0 !important;
-                margin-top: 0 !important;
-            }
-
-            /* stAppHeader 추가 제거 */
-            .stApp > header {
-                display: none !important;
-                visibility: hidden !important;
+                padding-top: 1rem !important;
             }
             
             </style>
@@ -497,7 +445,7 @@ class SF49StudioAssistant:
                 return {
                     "success": True,
                     "images": result["images"],
-                    "message": "이미지가 성공으로 생성되었습니다!"
+                    "message": "이미지가 성공���으로 생성되었습니다!"
                 }
             else:
                 return {
