@@ -1,4 +1,4 @@
-import streamlit as st
+import streamlit as st 
 from openai import OpenAI
 import requests
 import json
@@ -10,10 +10,10 @@ import base64
 from PIL import Image
 from streamlit_extras.stylable_container import stylable_container
 
-def apply_custom_css():
+def set_custom_style():
     st.markdown("""
         <style>
-        /* 기본 테마 */
+        /* 기본 레이아웃 */
         .main .block-container {
             padding-top: 0;
             padding-bottom: 0;
@@ -64,32 +64,57 @@ def apply_custom_css():
             background-color: transparent !important;
         }
 
-        /* 텍스트 입력 */
-        .stTextInput > div > div > input {
-            background-color: #FFFFFF;
-            border: 1px solid #E6E8EB;
-            border-radius: 6px;
-            padding: 0.75rem 1rem;
-            font-size: 1rem;
-            color: #1F2937;
-        }
-        
-        .stTextInput > div > div > input:focus {
-            border-color: #1756A9;
-            box-shadow: 0 0 0 2px rgba(23, 86, 169, 0.1);
-        }
-
         /* 채팅 메시지 */
         .stChatMessage {
             background-color: transparent !important;
             border: none !important;
         }
 
-        /* 버튼 */
-        .stButton > button {
-            width: 100%;
+        /* 이미지 컨테이너 */
+        .image-container {
+            position: relative;
+            overflow: hidden;
+            background-color: #FFFFFF;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 0.75rem auto;
+            border: 1px solid #E2E8F0;
+            transition: all 0.2s ease;
+            max-width: 600px;
+        }
+
+        .image-container:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 오버레이 버튼 */
+        .overlay-button {
+            background-color: #1756A9;
+            color: white;
             border-radius: 6px;
+            border: none;
+            width: 100%;
+            padding: 0.75rem;
+            font-size: 0.875rem;
             font-weight: 500;
+            transition: all 0.2s;
+            z-index: 10;
+        }
+
+        .overlay-button:hover {
+            background-color: #1148A0;
+            transform: translateY(-1px);
+        }
+
+        /* 헤더 스타일 */
+        .header-container {
+            background-color: #1756A9;
+            padding: 1.5rem 2rem;
+            margin: 0 auto;
+            color: white;
+            border-radius: 0 0 1rem 1rem;
+            max-width: 1200px;
         }
 
         /* 프로그레스 바 */
@@ -113,30 +138,6 @@ def apply_custom_css():
             border-radius: 4px;
         }
 
-        /* 사이드바 */
-        section[data-testid="stSidebar"] {
-            background-color: #FFFFFF;
-            border-right: 1px solid #E6E8EB;
-        }
-
-        /* 마크다운 텍스트 */
-        .stMarkdown {
-            color: #1F2937;
-        }
-
-        /* 채팅 아바타 */
-        .stChatMessage [data-testid="StyChatMessageAvatar"] {
-            background-color: #F8FAFC !important;
-            padding: 8px !important;
-            border-radius: 50% !important;
-            border: 2px solid #E2E8F0 !important;
-        }
-        
-        .stChatMessage [data-testid="StyChatMessageAvatar"] img {
-            width: 30px !important;
-            height: 30px !important;
-        }
-
         /* 네비게이션 컨테이너 */
         .nav-container {
             position: fixed;
@@ -152,36 +153,38 @@ def apply_custom_css():
             padding: 0 2rem;
         }
 
-        /* 이미지 오버레이 버튼 */
-        .image-container {
-            position: relative;
-            overflow: hidden;
-        }
-
-        .overlay-button {
-            background: rgba(0, 0, 0, 0.6);
+        /* 다운로드 버튼 */
+        .download-button {
+            background-color: #059669;
             color: white;
+            border-radius: 6px;
             border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1.2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.3s ease;
-            text-decoration: none;
-            z-index: 3;
+            width: 100%;
+            padding: 0.75rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
         }
 
-        .overlay-button:hover {
-            background: rgba(0, 0, 0, 0.8);
-            transform: translateY(-2px);
+        .download-button:hover {
+            background-color: #047857;
+            transform: translateY(-1px);
+        }
+
+        /* 채팅 아바타 */
+        .stChatMessage [data-testid="StyChatMessageAvatar"] {
+            background-color: #F8FAFC !important;
+            padding: 8px !important;
+            border-radius: 50% !important;
+            border: 2px solid #E2E8F0 !important;
+        }
+        
+        .stChatMessage [data-testid="StyChatMessageAvatar"] img {
+            width: 30px !important;
+            height: 30px !important;
         }
         </style>
     """, unsafe_allow_html=True)
-
 
 def typewriter_effect(text: str, speed: float = 0.03):
     """텍스트를 타이핑 효과로 표시"""
@@ -252,44 +255,64 @@ def fireworks_effect():
     </script>
     """, unsafe_allow_html=True)
 
-@st.cache_data
-def load_image(url):
-    try:
-        return Image.open(requests.get(url, stream=True).raw)
-    except Exception as e:
-        st.error(f"이미지 로딩 중 오류 발생: {str(e)}")
-        return None
-    
-class OpenAIClient:
+class SF49StudioAssistant:
     def __init__(self, api_key: str):
-        self.client = OpenAI(api_key=api_key)
+        self.client = OpenAI(api_key=st.secrets["openai_api_key"])
+        self.assistant = None
+        self.thread = None
+        self.webhook_base_url = "https://hook.eu2.make.com"
+        self.send_webhook = "/l1b22zor5v489mjyc6mgr8ybwliq763v"
+        self.retrieve_webhook = "/7qia4xlc2hvxt1qs1yr5eh7g9nqs8brd"
+        
+    def create_assistant(self):
+        """SF49 Studio Assistant 생성 및 상세 지침 설정"""
+        self.assistant = self.client.beta.assistants.create(
+            name="SF49 Studio Designer",
+            instructions="""
+            당신의 목적은 한국어로 대화하면서 이미지 생성을 처리하는 것입니다.
+            당신은 SF49 Studio의 전문 디자이너처럼 행동합니다.
+            창의적인 디자이너의 관점과 전문적이고 세련된 언어를 사용하며, 전문가의 톤을 유지합니다.
+            모든 커뮤니케이션에서 명확성, 디자인적 미적 감각, 그리고 전문성을 우선시합니다.
+            """,
+            model="gpt-4o-mini",
+            tools=[{
+                "type": "function",
+                "function": {
+                    "name": "send_image_request",
+                    "description": "이미지 생성을 위한 시각화 텍스트와 ID를 웹훅으로 전송",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "visualization_text": {
+                                "type": "string",
+                                "description": "인터넷 기사 썸네일 이미지를 위한 시각화 텍스트"
+                            },
+                            "unique_id": {
+                                "type": "string",
+                                "description": "생성할 이미지의 고유 ID"
+                            }
+                        },
+                        "required": ["visualization_text", "unique_id"]
+                    }
+                }
+            }]
+        )
+        return self.assistant
 
-    def create_assistant(self, instructions: str, model: str, tools: list):
-        try:
-            return self.client.beta.assistants.create(
-                name="SF49 Studio Designer",
-                instructions=instructions,
-                model=model,
-                tools=tools
-            )
-        except Exception as e:
-            st.error(f"Assistant 생성 중 오류 발생: {str(e)}")
-            return None
-
-
-class WebhookHandler:
-    def __init__(self, base_url: str, send_webhook: str, retrieve_webhook: str):
-        self.base_url = base_url
-        self.send_webhook = send_webhook
-        self.retrieve_webhook = retrieve_webhook
+    def create_thread(self):
+        """새로운 대화 스레드 생성"""
+        self.thread = self.client.beta.threads.create()
+        return self.thread
 
     def send_image_data(self, visualization_text: str, unique_id: str) -> Dict:
+        """이미지 생성 요청 전송 및 결과 확인"""
+        url = f"{self.webhook_base_url}{self.send_webhook}"
+        payload = {
+            "imageData": visualization_text,
+            "uniqueId": unique_id
+        }
+        
         try:
-            url = f"{self.base_url}{self.send_webhook}"
-            payload = {
-                "imageData": visualization_text,
-                "uniqueId": unique_id
-            }
             response = requests.post(url, json=payload, timeout=10)
             response.raise_for_status()
             return {
@@ -305,9 +328,11 @@ class WebhookHandler:
             }
 
     def get_image_links(self, unique_id: str) -> Dict:
+        """이미지 URL 목록 조회"""
+        url = f"{self.webhook_base_url}{self.retrieve_webhook}"
+        payload = {"uniqueId": unique_id}
+        
         try:
-            url = f"{self.base_url}{self.retrieve_webhook}"
-            payload = {"uniqueId": unique_id}
             response = requests.post(url, json=payload, timeout=10)
             response.raise_for_status()
             result = response.json()
@@ -330,52 +355,9 @@ class WebhookHandler:
                 "images": [],
                 "message": f"이미지 조회 중 오류가 발생했습니다: {str(e)}"
             }
-class SF49StudioAssistant:
-    def __init__(self, openai_client: OpenAIClient, webhook_handler: WebhookHandler):
-        self.client = openai_client
-        self.webhook_handler = webhook_handler
-        self.assistant = None
-        self.thread = None
-
-    def create_thread(self):
-        self.thread = self.client.client.beta.threads.create()
-        return self.thread
-
-    def create_assistant(self):
-        instructions = """
-        당신은 SF49 Studio의 전문 디자이너입니다.
-        사용자의 요청을 신중히 듣고 최적의 디자인을 제안합니다.
-        항상 친절하고 전문적인 태도를 유지하며,
-        디자인 과정에서 발생할 수 있는 문제에 대해 적절한 해결책을 제시합니다.
-        """
-        self.assistant = self.client.create_assistant(
-            instructions=instructions,
-            model="gpt-4o-mini",
-            tools=[{
-                "type": "function",
-                "function": {
-                    "name": "send_image_request",
-                    "description": "이미지 생성을 위한 시각화 텍스트와 ID를 웹훅으로 전송",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "visualization_text": {
-                                "type": "string",
-                                "description": "시각화를 위한 상세 텍스트"
-                            },
-                            "unique_id": {
-                                "type": "string",
-                                "description": "이미지의 고유 ID"
-                            }
-                        },
-                        "required": ["visualization_text", "unique_id"]
-                    }
-                }
-            }]
-        )
-        return self.assistant
 
     def process_message(self, user_message: str) -> Dict:
+        """사용자 메시지 처리 및 응답 생성"""
         try:
             if self.thread is None:
                 self.create_thread()
@@ -383,22 +365,22 @@ class SF49StudioAssistant:
             if 'cancel_generation' in st.session_state:
                 del st.session_state.cancel_generation
 
-            message = self.client.client.beta.threads.messages.create(
+            message = self.client.beta.threads.messages.create(
                 thread_id=self.thread.id,
                 role="user",
                 content=user_message
             )
 
-            run = self.client.client.beta.threads.runs.create(
+            run = self.client.beta.threads.runs.create(
                 thread_id=self.thread.id,
                 assistant_id=self.assistant.id
             )
 
             generated_id = None
-            progress_placeholder = st.empty()
+            status_container = st.empty()
             
             while True:
-                run = self.client.client.beta.threads.runs.retrieve(
+                run = self.client.beta.threads.runs.retrieve(
                     thread_id=self.thread.id,
                     run_id=run.id
                 )
@@ -406,40 +388,39 @@ class SF49StudioAssistant:
                 if run.status == "requires_action":
                     tool_outputs = []
                     for tool_call in run.required_action.submit_tool_outputs.tool_calls:
+                        args = json.loads(tool_call.function.arguments)
+                        
                         if tool_call.function.name == "send_image_request":
-                            args = json.loads(tool_call.function.arguments)
-                            result = self.webhook_handler.send_image_data(
+                            result = self.send_image_data(
                                 args["visualization_text"],
                                 args["unique_id"]
                             )
                             generated_id = result["unique_id"]
                             
                             if not result["success"]:
+                                typewriter_effect(result["message"])
                                 return {
                                     "status": "error",
                                     "response": result["message"]
                                 }
 
+                            response_data = {
+                                "status": "success",
+                                "unique_id": generated_id,
+                                "message": "이미지 생성을 시작합니다..."
+                            }
                             tool_outputs.append({
                                 "tool_call_id": tool_call.id,
-                                "output": json.dumps(result)
+                                "output": json.dumps(response_data)
                             })
 
-                    self.client.client.beta.threads.runs.submit_tool_outputs(
+                    run = self.client.beta.threads.runs.submit_tool_outputs(
                         thread_id=self.thread.id,
                         run_id=run.id,
                         tool_outputs=tool_outputs
                     )
 
                     if generated_id:
-                        progress_messages = [
-                            "🎨 디자인 컨셉을 구상 중입니다...",
-                            "✨ 시각적 요소를 배치하고 있습니다...",
-                            "🖌️ 디테일을 다듬고 있습니다...",
-                            "🔍 최종 점검 중입니다...",
-                            "✅ 마무리 작업을 진행 중입니다..."
-                        ]
-                        
                         with stylable_container(
                             key="progress_container",
                             css_styles="""
@@ -447,34 +428,33 @@ class SF49StudioAssistant:
                                 background-color: #F0F2F6;
                                 padding: 1rem;
                                 border-radius: 8px;
-                                margin: 1rem auto;
+                                margin: 1rem 0;
                                 border: 1px solid #E6E8EB;
-                                max-width: 800px;
                             }
                             """
                         ):
-                            progress_bar = progress_placeholder.progress(0)
+                            progress_bar = st.progress(0)
                             status_text = st.empty()
                             
-                            for i in range(1000):
-                                if 'cancel_generation' in st.session_state and st.session_state.cancel_generation:
-                                    progress_bar.empty()
-                                    status_text.empty()
-                                    return {
-                                        "status": "cancelled",
-                                        "response": "🚫 이미지 생성이 취소되었습니다."
-                                    }
-
+                            progress_messages = [
+                                "🎨 디자인 컨셉을 구상 중입니다...",
+                                "✨ 시각적 요소를 배치하고 있습니다...",
+                                "🖌️ 디테일을 다듬고 있습니다...",
+                                "🔍 최종 점검 중입니다...",
+                                "✅ 마무리 작업을 진행 중입니다..."
+                            ]
+                            
+                            for i in range(100):
                                 if i % 20 == 0:
                                     status_text.markdown(f"**{random.choice(progress_messages)}**")
-                                
-                                progress_bar.progress((i + 1) // 10)
+                                progress_value = (i + 1) / 100
+                                progress_bar.progress(progress_value)
                                 time.sleep(0.1)
 
                             progress_bar.empty()
                             status_text.empty()
 
-                        result = self.webhook_handler.get_image_links(generated_id)
+                        result = self.get_image_links(generated_id)
                         if result["success"] and result["images"]:
                             st.balloons()
                             confetti_effect()
@@ -489,8 +469,9 @@ class SF49StudioAssistant:
                                 "status": "error",
                                 "response": "🎨 이미지 생성에 시간이 더 필요합니다. 잠시 후에 다시 시도해 주세요."
                             }
+
                 elif run.status == "completed":
-                    messages = self.client.client.beta.threads.messages.list(
+                    messages = self.client.beta.threads.messages.list(
                         thread_id=self.thread.id
                     )
                     return {
@@ -501,27 +482,54 @@ class SF49StudioAssistant:
                 elif run.status == "failed":
                     return {
                         "status": "error",
-                        "response": "⚠️ 처리 중 문제가 발생했습니다. 다시 시도해주세요."
+                        "response": "처리 중 문제가 발생했습니다. 다시 시도해주세요."
                     }
                 
                 time.sleep(0.5)
-
+        
         except Exception as e:
-            st.error(f"예상치 못한 오류가 발생했습니다: {str(e)}")
             return {
                 "status": "error",
-                "response": "⚠️ 서비스 처리 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요."
+                "response": f"예상치 못한 오류가 발생했습니다: {str(e)}"
             }
+
+def initialize_session_state():
+    """세션 상태 초기화"""
+    if 'assistant' not in st.session_state:
+        api_key = st.secrets["OPENAI_API_KEY"]
+        st.session_state.assistant = SF49StudioAssistant(api_key)
+        st.session_state.assistant.create_assistant()
+    
+    if 'messages' not in st.session_state:
+        st.session_state.messages = []
+
 def main():
+    initialize_session_state()
+
     st.set_page_config(
         page_title="SF49 Studio Designer",
-        page_icon="✨",
+        page_icon="🎨",
         layout="wide",
         initial_sidebar_state="expanded"
     )
 
-    # 커스텀 CSS 적용
-    apply_custom_css()
+    set_custom_style()
+
+    with stylable_container(
+        key="header_container",
+        css_styles="""
+        {
+            background-color: #1756A9;
+            padding: 1.5rem 2rem;
+            margin: 0 auto;
+            color: white;
+            border-radius: 0 0 1rem 1rem;
+            max-width: 1200px;
+        }
+        """
+    ):
+        st.title("SF49 Studio Designer")
+        st.markdown('<p class="header-subtitle">AI 디자인 스튜디오</p>', unsafe_allow_html=True)
 
     # 플로팅 네비게이션
     st.markdown("""
@@ -552,317 +560,141 @@ def main():
             </a>
         </div>
     """, unsafe_allow_html=True)
-
-    # 헤더 섹션
-    with stylable_container(
-        key="header_container",
-        css_styles="""
-        {
-            background-color: #1756A9;
-            padding: 1.5rem 2rem;
-            margin: 0 auto;
-            color: white;
-            border-radius: 0 0 1rem 1rem;
-            max-width: 1200px;
-        }
-        """
-    ):
-        st.markdown("""
-            <h1 style='font-size: 2.5rem; font-weight: 600; margin-bottom: 0.5rem; letter-spacing: -0.5px; display: flex; align-items: center; gap: 0.5rem; color: white;'>
-                ✨ SF49 Studio Designer
-            </h1>
-            <h3 style='font-size: 1.25rem; font-weight: 400; opacity: 0.9; margin-top: 0; letter-spacing: -0.3px; color: white;'>
-                AI 기반 디자인 스튜디오
-            </h3>
-        """, unsafe_allow_html=True)
-
-    openai_client = OpenAIClient(api_key=st.secrets["openai_api_key"])
-    webhook_handler = WebhookHandler(
-        base_url="https://hook.eu2.make.com",
-        send_webhook="/l1b22zor5v489mjyc6mgr8ybwliq763v",
-        retrieve_webhook="/7qia4xlc2hvxt1qs1yr5eh7g9nqs8brd"
-    )
-    assistant = SF49StudioAssistant(openai_client, webhook_handler)
     
-    if not assistant.assistant:
-        assistant.create_assistant()
-
-    # 전체 채팅 영역을 감싸는 컨테이너
-    with stylable_container(
-        key="oxford_note_container",
-        css_styles="""
-        {
-            background-color: #FFFFFF;
-            border-radius: 12px;
-            border: 1px solid #E2E8F0;
-            margin: 0 auto 2rem auto;
-            padding: 2rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-            max-width: 1200px;
-        }
-        """
-    ):
-        # 인트로 메시지
-        if 'shown_intro' not in st.session_state:
-            with st.chat_message("assistant", avatar="🎨"):
+    # 설명 텍스트
+    if 'shown_intro' not in st.session_state:
+        with stylable_container(
+            key="intro_container",
+            css_styles="""
+            {
+                background-color: #FFFFFF;
+                padding: 1.5rem;
+                border-radius: 8px;
+                margin: 1rem 0;
+                border: 1px solid #E2E8F0;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            }
+            """
+        ):
+            with st.chat_message("assistant"):
                 st.markdown("""
-                    <div style='color: #1F2937;'>
-                        <h3 style='margin: 0 0 0.5rem 0; font-weight: 600;'>환영합니다! 👋</h3>
-                        <p style='margin: 0; color: #4B5563; line-height: 1.6;'>
-                            원하시는 이미지를 자연스럽게 설명해 주세요.<br>
-                            최적의 디자인으로 구현해드리겠습니다.
-                        </p>
-                    </div>
+                💫 원하시는 이미지를 설명해 주세요<br>
+                🎯 최적의 디자인으로 구현해드립니다
                 """, unsafe_allow_html=True)
-            st.session_state.shown_intro = True
+        st.session_state.shown_intro = True
 
-        # 채팅 메시지 영역
-        chat_container = st.container()
-        
-        with chat_container:
-            if 'messages' not in st.session_state:
-                st.session_state.messages = []
-
-            # 채팅 입력 (맨 아래에 위치)
-            prompt = st.chat_input("어떤 이미지를 만들어드릴까요?")
-            
-            if prompt:
-                # 사용자 메시지 추가 및 표시
-                st.session_state.messages.append({"role": "user", "content": prompt})
+    chat_container = st.container()
+    
+    with chat_container:
+        for message in st.session_state.messages:
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
                 
-                with st.chat_message("user", avatar="😊"):
-                    st.markdown(prompt)
-
-                # 진행 상태 메시지 리스트 (순차적으로 표시)
-                progress_messages = [
-                    "🎨 디자인 컨셉을 구상 중입니다...",
-                    "✨ 시각적 요소를 배치하고 있습니다...",
-                    "🖌️ 디테일을 다듬�� 있습니다...",
-                    "🔍 최종 점검 중입니다...",
-                    "✅ 마무리 작업을 진행 중입니다..."
-                ]
-                
-                response = assistant.process_message(prompt)
-                
-                if response["status"] == "success":
-                    with st.chat_message("assistant", avatar="🎨"):
-                        # 진행 상태 표시
-                        with stylable_container(
-                            key="progress_container",
-                            css_styles="""
-                            {
-                                background-color: #F0F2F6;
-                                padding: 1rem;
-                                border-radius: 8px;
-                                margin: 1rem 0;
-                                border: 1px solid #E6E8EB;
-                            }
-                            """
-                        ):
-                            progress_bar = st.progress(0)
-                            status_text = st.empty()
+                if "image_urls" in message:
+                    cols = st.columns(2)
+                    for idx, url in enumerate(message["image_urls"]):
+                        with cols[idx % 2]:
+                            with stylable_container(
+                                key=f"image_container_{idx}_{hash(url)}",
+                                css_styles="""
+                                {
+                                    background-color: #FFFFFF;
+                                    padding: 1rem;
+                                    border-radius: 8px;
+                                    margin: 0.75rem auto;
+                                    border: 1px solid #E2E8F0;
+                                    transition: all 0.2s ease;
+                                    max-width: 600px;
+                                }
+                                :hover {
+                                    transform: translateY(-2px);
+                                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                                }
+                                """
+                            ):
+                                buffer = io.BytesIO()
+                                img = Image.open(requests.get(url, stream=True).raw)
+                                img.save(buffer, format="PNG")
+                                img_base64 = base64.b64encode(buffer.getvalue()).decode()
+                                st.markdown(f"""
+                                    <div class="image-container">
+                                        <img src="{url}">
+                                        <div class="overlay-buttons">
+                                            <a href="data:image/png;base64,{img_base64}" 
+                                               download="Design_Option_{idx + 1}.png" 
+                                               class="overlay-button" 
+                                               title="이미지 다운로드">💾</a>
+                                            <a href="{url}" 
+                                               target="_blank" 
+                                               class="overlay-button" 
+                                               title="크게 보기">🔍</a>
+                                        </div>
+                                        <p class="image-caption">Design Option {idx + 1}</p>
+                                    </div>
+                                """, unsafe_allow_html=True)
                             
-                            # 순차적으로 진행 상태 메시지 표시
-                            total_steps = len(progress_messages)
-                            for idx, message in enumerate(progress_messages):
-                                status_text.markdown(f"**{message}**")
-                                progress_bar.progress((idx + 1) / total_steps)
-                                time.sleep(1)  # 각 단계별 지연 시간
-                                
-                                if 'cancel_generation' in st.session_state and st.session_state.cancel_generation:
-                                    progress_bar.empty()
-                                    status_text.empty()
-                                    return
-                            
-                            progress_bar.empty()
-                            status_text.empty()
+    if prompt := st.chat_input("어떤 이미지를 만들어드릴까요?"):
+       # 사용자 텍스트는 즉시 표시
+       st.session_state.messages.append({"role": "user", "content": prompt})
+       with st.chat_message("user"):
+           st.markdown(prompt)
 
-                        st.markdown(response["response"])
-                        message = {"role": "assistant", "content": response["response"]}
-                        
-                        if "images" in response and response["images"]:
-                            message["image_urls"] = response["images"]
-                            cols = st.columns(2)
-                            for idx, url in enumerate(response["images"]):
-                                with cols[idx % 2]:
-                                    with stylable_container(
-                                        key=f"new_image_container_{idx}_{hash(url)}",
-                                        css_styles="""
-                                        {
-                                            background-color: #FFFFFF;
-                                            padding: 1rem;
-                                            border-radius: 8px;
-                                            margin: 0.75rem auto;
-                                            border: 1px solid #E2E8F0;
-                                            transition: transform 0.2s ease;
-                                            max-width: 600px;
-                                            position: relative;
-                                        }
-                                        :hover {
-                                            transform: translateY(-2px);
-                                            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                                        }
-                                        """
-                                    ):
-                                        image = load_image(url)
-                                        if image:
-                                            st.image(image, use_column_width=True)
-                                            
-                                            col1, col2 = st.columns(2)
-                                            with col1:
-                                                with stylable_container(
-                                                    key=f"new_download_button_{idx}_{hash(url)}",
-                                                    css_styles="""
-                                                    button {
-                                                        background-color: #059669;
-                                                        color: white;
-                                                        border-radius: 6px;
-                                                        border: none;
-                                                        width: 100%;
-                                                        padding: 0.75rem;
-                                                        font-size: 0.875rem;
-                                                        font-weight: 500;
-                                                        transition: all 0.2s;
-                                                        z-index: 10;
-                                                    }
-                                                    button:hover {
-                                                        background-color: #047857;
-                                                        transform: translateY(-1px);
-                                                    }
-                                                    """
-                                                ):
-                                                    buffer = io.BytesIO()
-                                                    image.save(buffer, format="PNG")
-                                                    btn = st.download_button(
-                                                        label="💾 다운로드",
-                                                        data=buffer.getvalue(),
-                                                        file_name=f"SF49_Design_{idx + 1}.png",
-                                                        mime="image/png"
-                                                    )
-                                            
-                                            with col2:
-                                                with stylable_container(
-                                                    key=f"new_view_button_{idx}_{hash(url)}",
-                                                    css_styles="""
-                                                    button {
-                                                        background-color: #1756A9;
-                                                        color: white;
-                                                        border-radius: 6px;
-                                                        border: none;
-                                                        width: 100%;
-                                                        padding: 0.75rem;
-                                                        font-size: 0.875rem;
-                                                        font-weight: 500;
-                                                        transition: all 0.2s;
-                                                        z-index: 10;
-                                                    }
-                                                    button:hover {
-                                                        background-color: #1148A0;
-                                                        transform: translateY(-1px);
-                                                    }
-                                                    """
-                                                ):
-                                                    st.markdown(f'<a href="{url}" target="_blank"><button style="width:100%;padding:0.75rem;">🔍 크게 보기</button></a>', unsafe_allow_html=True)
-                        
-                        st.session_state.messages.append(message)
-                
-                elif response["status"] == "cancelled":
-                    with st.error(response["response"]):
-                        pass
-                else:
-                    with st.error(response["response"]):
-                        pass
-
-            # 이전 메시지 표시 (최신 메시지가 위에 오도록)
-            for message in reversed(st.session_state.messages[:-1]):  # 마지막 메시지 제외
-                with st.chat_message(
-                    message["role"],
-                    avatar="😊" if message["role"] == "user" else "🎨"
-                ):
-                    st.markdown(message["content"])
-                    if "image_urls" in message:
-                        cols = st.columns(2)
-                        for idx, url in enumerate(message["image_urls"]):
-                            with cols[idx % 2]:
-                                with stylable_container(
-                                    key=f"image_container_{idx}_{hash(url)}",
-                                    css_styles="""
-                                    {
-                                        background-color: #FFFFFF;
-                                        padding: 1rem;
-                                        border-radius: 8px;
-                                        margin: 0.75rem auto;
-                                        border: 1px solid #E2E8F0;
-                                        transition: all 0.2s ease;
-                                        max-width: 600px;
-                                        position: relative;
-                                    }
-                                    :hover {
-                                        transform: translateY(-2px);
-                                        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                                    }
-                                    """
-                                ):
-                                    image = load_image(url)
-                                    if image:
-                                        st.image(image, use_column_width=True)
-                                        
-                                        col1, col2 = st.columns(2)
-                                        with col1:
-                                            with stylable_container(
-                                                key=f"download_button_{idx}_{hash(url)}",
-                                                css_styles="""
-                                                button {
-                                                    background-color: #059669;
-                                                    color: white;
-                                                    border-radius: 6px;
-                                                    border: none;
-                                                    width: 100%;
-                                                    padding: 0.75rem;
-                                                    font-size: 0.875rem;
-                                                    font-weight: 500;
-                                                    transition: all 0.2s;
-                                                    z-index: 10;
-                                                }
-                                                button:hover {
-                                                    background-color: #047857;
-                                                    transform: translateY(-1px);
-                                                }
-                                                """
-                                            ):
-                                                buffer = io.BytesIO()
-                                                image.save(buffer, format="PNG")
-                                                btn = st.download_button(
-                                                    label="💾 다운로드",
-                                                    data=buffer.getvalue(),
-                                                    file_name=f"SF49_Design_{idx + 1}.png",
-                                                    mime="image/png"
-                                                )
-                                        
-                                        with col2:
-                                            with stylable_container(
-                                                key=f"view_button_{idx}_{hash(url)}",
-                                                css_styles="""
-                                                button {
-                                                    background-color: #1756A9;
-                                                    color: white;
-                                                    border-radius: 6px;
-                                                    border: none;
-                                                    width: 100%;
-                                                    padding: 0.75rem;
-                                                    font-size: 0.875rem;
-                                                    font-weight: 500;
-                                                    transition: all 0.2s;
-                                                    z-index: 10;
-                                                }
-                                                button:hover {
-                                                    background-color: #1148A0;
-                                                    transform: translateY(-1px);
-                                                }
-                                                """
-                                            ):
-                                                st.markdown(f'<a href="{url}" target="_blank"><button style="width:100%;padding:0.75rem;">🔍 크게 보기</button></a>', unsafe_allow_html=True)
-
+       # AI 응답
+       response = st.session_state.assistant.process_message(prompt)
+       with st.chat_message("assistant"):
+           if response["status"] == "success":
+               typewriter_effect(response["response"], speed=0.02)
+               message = {"role": "assistant", "content": response["response"]}
+               
+               # 이미지 URL이 있으면 해당 URL도 표시
+               if "images" in response and response["images"]:
+                   message["image_urls"] = response["images"]
+                   cols = st.columns(2)
+                   for idx, url in enumerate(response["images"]):
+                       with cols[idx % 2]:
+                           with stylable_container(
+                               key=f"new_image_container_{idx}_{hash(url)}",
+                               css_styles="""
+                               {
+                                   background-color: #FFFFFF;
+                                   padding: 1rem;
+                                   border-radius: 8px;
+                                   margin: 0.75rem auto;
+                                   border: 1px solid #E2E8F0;
+                                   transition: all 0.2s ease;
+                                   max-width: 600px;
+                                   position: relative;
+                               }
+                               :hover {
+                                   transform: translateY(-2px);
+                                   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                               }
+                               """
+                           ):
+                               buffer = io.BytesIO()
+                               img = Image.open(requests.get(url, stream=True).raw)
+                               img.save(buffer, format="PNG")
+                               img_base64 = base64.b64encode(buffer.getvalue()).decode()
+                               st.markdown(f"""
+                                   <div class="image-container">
+                                       <img src="{url}">
+                                       <div class="overlay-buttons">
+                                           <a href="data:image/png;base64,{img_base64}" 
+                                              download="Design_Option_{idx + 1}.png" 
+                                              class="overlay-button" 
+                                              title="이미지 다운로드">💾</a>
+                                           <a href="{url}" 
+                                              target="_blank" 
+                                              class="overlay-button" 
+                                              title="크게 보기">🔍</a>
+                                       </div>
+                                       <p class="image-caption">Design Option {idx + 1}</p>
+                                   </div>
+                               """, unsafe_allow_html=True)
+               
+               st.session_state.messages.append(message)
+           else:
+               typewriter_effect(response["response"], speed=0.02)
 
 if __name__ == "__main__":
-    main()
+   main()
