@@ -154,7 +154,7 @@ def set_custom_style():
                 box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             }
             
-            /* 이미지 스타일 */
+            /* 이미지 스��일 */
             .image-container {
                 margin: 1rem 0;
                 transition: all 0.3s ease;
@@ -283,9 +283,10 @@ def set_custom_style():
                 height: 60px !important;
                 background-color: #FF5722 !important;
                 display: flex !important;
-                justify-content: center !important;
+                justify-content: flex-start !important;
                 align-items: center !important;
                 padding: 0 20px !important;
+                padding-left: 60% !important;
                 z-index: 999999 !important;
                 gap: 20px !important;
             }
@@ -540,7 +541,7 @@ class SF49StudioAssistant:
             }
 
     def process_message(self, user_message: str) -> Dict:
-        """사용자 메시지 처리 및 응답 생성"""
+        """��용자 메시지 처리 및 응답 생성"""
         if self.thread is None:
             self.create_thread()
 
