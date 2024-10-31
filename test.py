@@ -10,8 +10,7 @@ import base64
 from PIL import Image
 from streamlit_extras.stylable_container import stylable_container
 
-def do_stuff_on_page_load():
-    st.set_page_config(
+st.set_page_config(
         page_title="SF49.Studio Designer",
         page_icon="🎨",
         layout="centered",
@@ -814,5 +813,4 @@ def main():
             st.markdown('</div>', unsafe_allow_html=True)
 
 if __name__ == "__main__":
-    do_stuff_on_page_load()
     main()
