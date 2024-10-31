@@ -109,7 +109,7 @@ class SF49StudioAssistant:
         """
         self.assistant = self.client.create_assistant(
             instructions=instructions,
-            model="gpt-4-1106-preview",
+            model="gpt-4o-mini",
             tools=[{
                 "type": "function",
                 "function": {
