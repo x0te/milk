@@ -29,8 +29,8 @@ def apply_custom_css():
 
         /* 네비게이션 아이콘 배경색 수정 */
         .nav-icon {
-            background-color: #FFA500 !important;  /* 주황색 */
-            border: 1px solid rgba(255, 165, 0, 0.3) !important;
+            background-color: #FF6B00 !important;  /* 쨍한 주황색 */
+            border: 1px solid rgba(255, 107, 0, 0.3) !important;
         }
 
         .nav-icon:hover {
