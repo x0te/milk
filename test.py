@@ -18,234 +18,160 @@ def load_image(url):
         st.error(f"이미지 로딩 중 오류 발생: {str(e)}")
         return None
 
-# 스타일 설정을 별도로 분리하여 관리
 def set_custom_style():
     st.markdown("""
         <style>
-        /* 라이트 테마 */
-        body, .stApp {
-            background-color: #FFFFFF !important;
-            color: #2C3E50;
+        /* 전체 앱 스타일 */
+        .stApp {
+            background-color: #FFFFFF;
         }
         
-        /* 메인 블록 컨테이너 스타일 적용 */
-        .stAppViewContainer, .block-container {
-            background-color: #FFFFFF !important;
+        /* 헤더 스타일 */
+        .stHeader {
+            background-color: #FFFFFF;
+            border-bottom: 1px solid #F0F2F6;
         }
         
-        /* 네비게이션 컨테이너 */
-        .nav-container {
-            position: fixed;
-            top: 4.5rem;
-            right: 20px;
-            z-index: 1000;
-            display: flex;
-            gap: 0.5rem;
-            background: transparent;
-        }
-
-        /* 아이콘 버튼 */
-        .nav-icon {
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-            font-size: 1.2rem;
-            text-decoration: none;
-            color: #2C3E50;
-            position: relative;
-            border: 1px solid rgba(44, 62, 80, 0.1);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .nav-icon:hover {
-            background: rgba(52, 152, 219, 0.1);
-            transform: translateY(-2px);
-            border-color: rgba(52, 152, 219, 0.3);
-        }
-
-        /* 툴팁 */
-        .nav-icon::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            right: 50px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(44, 62, 80, 0.9);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            font-size: 0.875rem;
-            white-space: nowrap;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .nav-icon:hover::after {
-            opacity: 1;
-            visibility: visible;
-            right: 45px;
+        /* 사이드바 스타일 */
+        .css-1d391kg {
+            background-color: #FFFFFF;
         }
         
-        /* 채팅 인터페이스 */
-        .element-container .stChatMessage {
-            background: rgba(255, 255, 255, 1.0) !important;
-            border: 1px solid rgba(44, 62, 80, 0.1);
-            border-radius: 8px;
+        /* 메인 콘텐츠 영역 */
+        .main .block-container {
+            max-width: 1000px;
+            padding: 2rem;
+            background-color: #FFFFFF;
+        }
+        
+        /* 채팅 메시지 스타일 */
+        .stChatMessage {
+            background-color: #F8F9FA;
+            border-radius: 10px;
             padding: 1rem;
-            margin: 1rem 0;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            color: #2C3E50;
+            margin: 0.5rem 0;
+            border: 1px solid #E9ECEF;
         }
         
-        .element-container .stChatMessage:hover {
-            border-color: rgba(52, 152, 219, 0.3);
+        /* 사용자 메시지 */
+        .stChatMessage[data-testid="user-message"] {
+            background-color: #E3F2FD;
         }
         
-        /* 입력 필드 */
+        /* 어시스턴트 메시지 */
+        .stChatMessage[data-testid="assistant-message"] {
+            background-color: #FFFFFF;
+        }
+        
+        /* 입력 필드 스타일 */
         .stTextInput > div > div > input {
-            background: #FFFFFF;
-            border: 1px solid rgba(44, 62, 80, 0.1);
-            padding: 0.8rem 1rem;
-            border-radius: 6px;
-            color: #2C3E50;
-            width: calc(100% - 2rem);
-            margin: 0 auto;
+            border: 1px solid #DEE2E6;
+            border-radius: 8px;
+            padding: 0.75rem;
+            background-color: #FFFFFF;
         }
         
         .stTextInput > div > div > input:focus {
-            border-color: #3498DB;
-            box-shadow: 0 0 0 1px rgba(52, 152, 219, 0.3);
+            border-color: #4299E1;
+            box-shadow: 0 0 0 1px #4299E1;
         }
         
-        /* 프로그레스 바 */
-        .stProgress > div > div {
-            background: linear-gradient(90deg, #3498DB, #2980B9) !important;
+        /* 버튼 스타일 */
+        .stButton > button {
+            background-color: #4299E1;
+            color: white;
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            border: none;
+            transition: all 0.2s;
         }
         
-        .stProgress {
-            background: rgba(44, 62, 80, 0.1);
+        .stButton > button:hover {
+            background-color: #3182CE;
+            transform: translateY(-1px);
         }
         
-        /* 캡션과 설명 텍스트 */
-        .header-subtitle {
-            color: #7F8C8D;
-            font-size: 1.1rem;
-            margin-bottom: 2rem;
-        }
-        
-        .intro-text {
-            background: #FFFFFF;
-            padding: 1.5rem;
-            border-radius: 8px;
-            border: 1px solid rgba(44, 62, 80, 0.1);
-            margin: 1rem 0 2rem 0;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            color: #2C3E50;
-        }
-        
-        /* 이미지 스타일 */
+        /* 이미지 컨테이너 스타일 */
         .image-container {
-            margin: 1rem 0;
-            transition: all 0.3s ease;
-            position: relative;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             background: #FFFFFF;
+            border-radius: 10px;
             padding: 0.5rem;
-            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin: 1rem 0;
+            transition: transform 0.2s;
+        }
+        
+        .image-container:hover {
+            transform: translateY(-2px);
         }
         
         .image-container img {
             width: 100%;
-            border-radius: 4px;
-            border: 1px solid rgba(44, 62, 80, 0.1);
+            border-radius: 8px;
         }
         
-        .image-container:hover {
-            transform: scale(1.02);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        
-        .image-caption {
-            text-align: center;
-            color: #7F8C8D;
-            margin-top: 0.5rem;
-            font-size: 0.9rem;
-        }
-
         /* 이미지 오버레이 버튼 */
-        .image-container .overlay-buttons {
+        .overlay-buttons {
             position: absolute;
             top: 10px;
             right: 10px;
             display: flex;
             gap: 0.5rem;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.2s;
         }
-
+        
         .image-container:hover .overlay-buttons {
             opacity: 1;
         }
-
+        
         .overlay-button {
             background: rgba(255, 255, 255, 0.9);
-            color: #2C3E50;
-            border: none;
-            padding: 0.5rem;
+            color: #4299E1;
             border-radius: 50%;
-            cursor: pointer;
-            font-size: 1.2rem;
+            width: 32px;
+            height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-decoration: none;
+            transition: all 0.2s;
         }
-
+        
         .overlay-button:hover {
-            background: rgba(52, 152, 219, 0.1);
-            color: #3498DB;
-        }
-
-        /* Streamlit 기본 요소 조정 */
-        .stDeployButton {
-            display: none;
-        }
-        
-        header[data-testid="stHeader"] {
-            background: rgba(255, 255, 255, 1.0);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(44, 62, 80, 0.1);
-        }
-
-        .main > div:first-child {
-            padding-top: 5rem !important;
-        }
-        
-        /* 취소 버튼 스타일 */
-        .cancel-button {
-            background-color: #E74C3C;
+            background: #4299E1;
             color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .cancel-button:hover {
-            background-color: #C0392B;
         }
         
+        /* 프로그레스 바 스타일 */
+        .stProgress > div > div {
+            background-color: #4299E1;
+        }
+        
+        /* 메시지 스타일 */
+        .success-message {
+            color: #2F855A;
+            background-color: #F0FFF4;
+            padding: 1rem;
+            border-radius: 6px;
+            border: 1px solid #C6F6D5;
+        }
+        
+        .error-message {
+            color: #C53030;
+            background-color: #FFF5F5;
+            padding: 1rem;
+            border-radius: 6px;
+            border: 1px solid #FED7D7;
+        }
+        
+        /* 캡션 스타일 */
+        .image-caption {
+            text-align: center;
+            color: #718096;
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+        }
         </style>
     """, unsafe_allow_html=True)
 
@@ -299,6 +225,7 @@ class WebhookHandler:
             response = requests.post(url, json=payload, timeout=10)
             response.raise_for_status()
             result = response.json()
+            
             if "images" in result and isinstance(result["images"], list) and len(result["images"]) > 0:
                 return {
                     "success": True,
@@ -325,12 +252,16 @@ class SF49StudioAssistant:
         self.assistant = None
         self.thread = None
 
+    def create_thread(self):
+        self.thread = self.client.client.beta.threads.create()
+        return self.thread
+
     def create_assistant(self):
         instructions = """
-        당신의 목적은 한국어로 대화하면서 이미지 생성을 처리하는 것입니다.
-        당신은 SF49 Studio의 전문 디자이너처럼 행동합니다.
-        창의적인 디자이너의 관점과 전문적이고 세련된 언어를 사용하며, 전문가의 톤을 유지합니다.
-        모든 커뮤니케이션에서 명확성, 디자인적 미적 감각, 그리고 전문성을 우선시합니다.
+        당신은 SF49 Studio의 전문 디자이너입니다.
+        사용자의 요청을 신중히 듣고 최적의 디자인을 제안합니다.
+        항상 친절하고 전문적인 태도를 유지하며,
+        디자인 과정에서 발생할 수 있는 문제에 대해 적절한 해결책을 제시합니다.
         """
         self.assistant = self.client.create_assistant(
             instructions=instructions,
@@ -345,11 +276,11 @@ class SF49StudioAssistant:
                         "properties": {
                             "visualization_text": {
                                 "type": "string",
-                                "description": "인터넷 기사 썸네일 이미지를 위한 시각화 텍스트"
+                                "description": "시각화를 위한 상세 텍스트"
                             },
                             "unique_id": {
                                 "type": "string",
-                                "description": "생성할 이미지의 고유 ID"
+                                "description": "이미지의 고유 ID"
                             }
                         },
                         "required": ["visualization_text", "unique_id"]
@@ -367,7 +298,7 @@ class SF49StudioAssistant:
             if 'cancel_generation' in st.session_state:
                 del st.session_state.cancel_generation
 
-            self.client.client.beta.threads.messages.create(
+            message = self.client.client.beta.threads.messages.create(
                 thread_id=self.thread.id,
                 role="user",
                 content=user_message
@@ -379,10 +310,17 @@ class SF49StudioAssistant:
             )
 
             generated_id = None
-            status_container = st.empty()
+            progress_placeholder = st.empty()
             
-            cancel_button = st.button("생성 취소", key="cancel_generation", 
-                                    help="이미지 생성을 취소합니다")
+            # 새로운 취소 버튼 디자인
+            cancel_col1, cancel_col2, cancel_col3 = st.columns([1, 1, 1])
+            with cancel_col2:
+                cancel_button = st.button(
+                    "🚫 생성 취소",
+                    key="cancel_generation",
+                    help="현재 진행 중인 이미지 생성을 취소합니다",
+                    use_container_width=True
+                )
 
             while True:
                 if cancel_button or ('cancel_generation' in st.session_state and 
@@ -391,9 +329,10 @@ class SF49StudioAssistant:
                         thread_id=self.thread.id,
                         run_id=run.id
                     )
+                    progress_placeholder.empty()
                     return {
                         "status": "cancelled",
-                        "response": "이미지 생성이 취소되었습니다."
+                        "response": "🚫 이미지 생성이 취소되었습니다."
                     }
 
                 run = self.client.client.beta.threads.runs.retrieve(
@@ -404,9 +343,8 @@ class SF49StudioAssistant:
                 if run.status == "requires_action":
                     tool_outputs = []
                     for tool_call in run.required_action.submit_tool_outputs.tool_calls:
-                        args = json.loads(tool_call.function.arguments)
-                        
                         if tool_call.function.name == "send_image_request":
+                            args = json.loads(tool_call.function.arguments)
                             result = self.webhook_handler.send_image_data(
                                 args["visualization_text"],
                                 args["unique_id"]
@@ -419,17 +357,12 @@ class SF49StudioAssistant:
                                     "response": result["message"]
                                 }
 
-                            response_data = {
-                                "status": "success",
-                                "unique_id": generated_id,
-                                "message": "이미지 생성을 시작합니다..."
-                            }
                             tool_outputs.append({
                                 "tool_call_id": tool_call.id,
-                                "output": json.dumps(response_data)
+                                "output": json.dumps(result)
                             })
 
-                    run = self.client.client.beta.threads.runs.submit_tool_outputs(
+                    self.client.client.beta.threads.runs.submit_tool_outputs(
                         thread_id=self.thread.id,
                         run_id=run.id,
                         tool_outputs=tool_outputs
@@ -437,48 +370,47 @@ class SF49StudioAssistant:
 
                     if generated_id:
                         progress_messages = [
-                            "이미지 생성을 위한 초기 설정을 준비하고 있습니다...",
-                            "아이디어를 시각적 요소로 분석하고 있습니다...",
-                            "디자인 요소를 구성하고 있습니다...",
-                            "이미지의 세부 요소를 조정하고 있습니다...",
-                            "최종 디테일을 다듬고 있습니다...",
-                            "생성된 이미지를 최적화하고 있습니다..."
+                            "🎨 디자인 컨셉을 구상 중입니다...",
+                            "✨ 시각적 요소를 배치하고 있습니다...",
+                            "🖌️ 디테일을 다듬고 있습니다...",
+                            "🔍 최종 점검 중입니다...",
+                            "✅ 마무리 작업을 진행 중입니다..."
                         ]
                         
-                        my_bar = st.progress(0)
+                        progress_bar = progress_placeholder.progress(0)
+                        status_text = progress_placeholder.empty()
                         
                         for i in range(100):
-                            if ('cancel_generation' in st.session_state and 
-                                st.session_state.cancel_generation):
-                                my_bar.empty()
-                                status_container.empty()
+                            if cancel_button or ('cancel_generation' in st.session_state and 
+                                               st.session_state.cancel_generation):
+                                progress_bar.empty()
+                                status_text.empty()
                                 return {
                                     "status": "cancelled",
-                                    "response": "이미지 생성이 취소되었습니다."
+                                    "response": "🚫 이미지 생성이 취소되었습니다."
                                 }
 
                             if i % 20 == 0:
-                                progress_text = random.choice(progress_messages)
-                                status_container.markdown(f"**{progress_text}**")
-                            progress_value = (i + 1) / 100
-                            my_bar.progress(progress_value)
-                            time.sleep(0.5)
+                                status_text.markdown(f"**{random.choice(progress_messages)}**")
+                            
+                            progress_bar.progress(i + 1)
+                            time.sleep(0.1)
 
-                        my_bar.empty()
-                        status_container.empty()
+                        progress_bar.empty()
+                        status_text.empty()
 
                         result = self.webhook_handler.get_image_links(generated_id)
                         if result["success"] and result["images"]:
                             st.balloons()
                             return {
                                 "status": "success",
-                                "response": "✨ 디자인이 완성되었습니다! 마음에 드시는 결과물이 있으신가요?",
+                                "response": "✨ 디자인이 완성되었습니다!",
                                 "images": result["images"]
                             }
                         else:
                             return {
                                 "status": "error",
-                                "response": "🎨 이미지 생성에 시간이 더 필요합니다. 잠시 후에 다시 시도해 주시겠어요?"
+                                "response": "🎨 이미지 생성에 시간이 더 필요합니다. 잠시 후에 다시 시도해 주세요."
                             }
 
                 elif run.status == "completed":
@@ -493,7 +425,7 @@ class SF49StudioAssistant:
                 elif run.status == "failed":
                     return {
                         "status": "error",
-                        "response": "처리 중 문제가 발생했습니다. 다시 시도해주세요."
+                        "response": "⚠️ 처리 중 문제가 발생했습니다. 다시 시도해주세요."
                     }
                 
                 time.sleep(0.5)
@@ -502,18 +434,26 @@ class SF49StudioAssistant:
             st.error(f"예상치 못한 오류가 발생했습니다: {str(e)}")
             return {
                 "status": "error",
-                "response": "서비스 처리 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요."
+                "response": "⚠️ 서비스 처리 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요."
             }
 
 def main():
     st.set_page_config(
         page_title="SF49 Studio Designer",
-        page_icon="🌟",
+        page_icon="✨",
         layout="wide",
         initial_sidebar_state="expanded"
     )
 
     set_custom_style()
+
+    # 헤더 영역
+    st.markdown("""
+        <div style='text-align: center; padding: 2rem 0;'>
+            <h1 style='color: #2D3748; margin-bottom: 0.5rem;'>✨ SF49 Studio Designer</h1>
+            <p style='color: #718096; font-size: 1.1rem;'>AI 기반 디자인 스튜디오</p>
+        </div>
+    """, unsafe_allow_html=True)
 
     openai_client = OpenAIClient(api_key=st.secrets["openai_api_key"])
     webhook_handler = WebhookHandler(
@@ -523,14 +463,14 @@ def main():
     )
     assistant = SF49StudioAssistant(openai_client, webhook_handler)
 
-    st.title("SF49 Studio Designer")
-    st.markdown('<p class="header-subtitle">AI 디자인 스튜디오</p>', unsafe_allow_html=True)
-
     if 'shown_intro' not in st.session_state:
-        with st.chat_message("assistant"):
+        with st.chat_message("assistant", avatar="✨"):
             st.markdown("""
-            💫 원하시는 이미지를 설명해 주세요<br>
-            🎯 최적의 디자인으로 구현해드립니다
+                <div style='background-color: #F7FAFC; padding: 1.5rem; border-radius: 10px; border: 1px solid #E2E8F0;'>
+                    <h3 style='color: #2D3748; margin-bottom: 1rem;'>환영합니다! 👋</h3>
+                    <p style='color: #4A5568; margin-bottom: 0.5rem;'>원하시는 이미지를 자연스럽게 설명해 주세요.</p>
+                    <p style='color: #4A5568;'>최적의 디자인으로 구현해드리겠습니다.</p>
+                </div>
             """, unsafe_allow_html=True)
         st.session_state.shown_intro = True
 
@@ -541,7 +481,7 @@ def main():
             st.session_state.messages = []
         
         for message in st.session_state.messages:
-            with st.chat_message(message["role"]):
+            with st.chat_message(message["role"], avatar="👤" if message["role"] == "user" else "✨"):
                 st.markdown(message["content"])
                 
                 if "image_urls" in message:
@@ -555,10 +495,10 @@ def main():
                                 img_base64 = base64.b64encode(buffer.getvalue()).decode()
                                 st.markdown(f"""
                                     <div class="image-container">
-                                        <img src="{url}">
+                                        <img src="{url}" alt="Generated Design {idx + 1}">
                                         <div class="overlay-buttons">
                                             <a href="data:image/png;base64,{img_base64}" 
-                                               download="Design_Option_{idx + 1}.png" 
+                                               download="SF49_Design_{idx + 1}.png" 
                                                class="overlay-button" 
                                                title="이미지 다운로드">💾</a>
                                             <a href="{url}" 
@@ -572,10 +512,10 @@ def main():
 
     if prompt := st.chat_input("어떤 이미지를 만들어드릴까요?"):
         st.session_state.messages.append({"role": "user", "content": prompt})
-        with st.chat_message("user"):
+        with st.chat_message("user", avatar="👤"):
             st.markdown(prompt)
 
-        with st.chat_message("assistant"):
+        with st.chat_message("assistant", avatar="✨"):
             response = assistant.process_message(prompt)
             
             if response["status"] == "success":
@@ -594,10 +534,10 @@ def main():
                                 img_base64 = base64.b64encode(buffer.getvalue()).decode()
                                 st.markdown(f"""
                                     <div class="image-container">
-                                        <img src="{url}">
+                                        <img src="{url}" alt="Generated Design {idx + 1}">
                                         <div class="overlay-buttons">
                                             <a href="data:image/png;base64,{img_base64}" 
-                                               download="Design_Option_{idx + 1}.png" 
+                                               download="SF49_Design_{idx + 1}.png" 
                                                class="overlay-button" 
                                                title="이미지 다운로드">💾</a>
                                             <a href="{url}" 
