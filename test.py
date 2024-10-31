@@ -29,7 +29,7 @@ def set_custom_style():
         }
         
         /* 메인 블록 컨테이너 스타일 적용 */
-        .block-container {
+        .stAppViewContainer, .block-container {
             background-color: #FFFFFF !important;
         }
         
