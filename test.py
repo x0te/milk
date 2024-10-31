@@ -283,10 +283,11 @@ def set_custom_style():
                 height: 60px !important;
                 background-color: #FF5722 !important;
                 display: flex !important;
-                justify-content: flex-end !important;
+                justify-content: center !important;
                 align-items: center !important;
                 padding: 0 20px !important;
                 z-index: 999999 !important;
+                gap: 20px !important;
             }
 
             /* 아이콘 크기 조정 */
