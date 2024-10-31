@@ -218,8 +218,8 @@ def apply_custom_css():
             display: flex;
             gap: 0.5rem;
             opacity: 0;
-            transition: opacity 0.3s ease;
-            z-index: 100;
+            transition: opacity 0.3s ease-in-out;
+            z-index: 10;
         }
 
         .image-container:hover .overlay-buttons {
@@ -240,6 +240,7 @@ def apply_custom_css():
             justify-content: center;
             transition: background 0.3s ease;
             text-decoration: none;
+            z-index: 20;
         }
 
         .overlay-button:hover {
