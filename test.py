@@ -680,14 +680,6 @@ def initialize_session_state():
 
 def main():
     initialize_session_state()
-
-    st.set_page_config(
-        page_title="SF49 Studio Designer",
-        page_icon="🎨",
-        layout="wide",
-        initial_sidebar_state="expanded"
-    )
-
     set_custom_style()
 
     # 상단 여백
