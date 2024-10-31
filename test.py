@@ -505,7 +505,7 @@ class SF49StudioAssistant:
                             },
                             "unique_id": {
                                 "type": "string",
-                                "description": "생성할 이미지의 고유 ID (반드시 끝에 1000-9999 사이의 랜덤 ���자 포함)"
+                                "description": "생성할 이미지의 고유 ID (반드시 끝에 1000-9999 사이의 랜덤 자 포함)"
                             }
                         },
                         "required": ["visualization_text", "unique_id"]
@@ -554,17 +554,26 @@ class SF49StudioAssistant:
             result = response.json()
             
             if "images" in result and isinstance(result["images"], list) and len(result["images"]) > 0:
-                return {
-                    "success": True,
-                    "images": result["images"],
-                    "message": "이미지가 성공적으로 생성되었습니다!"
-                }
-            else:
-                return {
-                    "success": False,
-                    "images": [],
-                    "message": "이미지가 아직 준비되지 않았습니다."
-                }
+                # URL 유효성 검사
+                valid_urls = all(
+                    url.startswith(('http://', 'https://')) 
+                    for url in result["images"]
+                )
+                
+                if valid_urls:
+                    return {
+                        "success": True,
+                        "images": result["images"],
+                        "message": "이미지가 성공적으로 생성되었습니다!"
+                    }
+                
+            # URL이 유효하지 않거나 아직 준비되지 않은 경우
+            return {
+                "success": False,
+                "images": [],
+                "message": "이미지가 아직 준비되지 않았습니다."
+            }
+            
         except requests.exceptions.RequestException as e:
             return {
                 "success": False,
@@ -657,7 +666,7 @@ class SF49StudioAssistant:
                             fireworks_effect()
                             return {
                                 "status": "success",
-                                "response": "✨ 디자인이 완성되었습니다! 마음에 드시는 결과물이 있으신가요?",
+                                "response": "✨ 디자인이 완성되���습니다! 마음에 드시는 결과물이 있으신가요?",
                                 "images": result["images"]
                             }
                         else:
