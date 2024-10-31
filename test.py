@@ -156,43 +156,7 @@ class SF49StudioAssistant:
             generated_id = None
             progress_placeholder = st.empty()
             
-            # 취소 버튼
-            with stylable_container(
-                key="cancel_button_container",
-                css_styles="""
-                button {
-                    background-color: #e53e3e;
-                    color: white;
-                    border-radius: 0.5em;
-                    border: none;
-                    width: 200px;
-                    margin: 1em auto;
-                    display: block;
-                }
-                button:hover {
-                    background-color: #c53030;
-                }
-                """
-            ):
-                cancel_button = st.button(
-                    "🚫 생성 취소",
-                    key="cancel_generation",
-                    help="현재 진행 중인 이미지 생성을 취소합니다"
-                )
-
             while True:
-                if cancel_button or ('cancel_generation' in st.session_state and 
-                                   st.session_state.cancel_generation):
-                    self.client.client.beta.threads.runs.cancel(
-                        thread_id=self.thread.id,
-                        run_id=run.id
-                    )
-                    progress_placeholder.empty()
-                    return {
-                        "status": "cancelled",
-                        "response": "🚫 이미지 생성이 취소되었습니다."
-                    }
-
                 run = self.client.client.beta.threads.runs.retrieve(
                     thread_id=self.thread.id,
                     run_id=run.id
@@ -239,10 +203,11 @@ class SF49StudioAssistant:
                             key="progress_container",
                             css_styles="""
                             {
-                                background-color: #f7fafc;
-                                padding: 1em;
-                                border-radius: 0.5em;
-                                margin: 1em 0;
+                                background-color: #f2f4f8;
+                                padding: 16px;
+                                border-radius: 12px;
+                                margin: 16px 0;
+                                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
                             }
                             """
                         ):
@@ -250,8 +215,7 @@ class SF49StudioAssistant:
                             status_text = st.empty()
                             
                             for i in range(100):
-                                if cancel_button or ('cancel_generation' in st.session_state and 
-                                                   st.session_state.cancel_generation):
+                                if 'cancel_generation' in st.session_state and st.session_state.cancel_generation:
                                     progress_bar.empty()
                                     status_text.empty()
                                     return {
@@ -267,6 +231,30 @@ class SF49StudioAssistant:
 
                             progress_bar.empty()
                             status_text.empty()
+
+                        # 취소 버튼 생성
+                        with stylable_container(
+                            key="cancel_button_container",
+                            css_styles="""
+                            button {
+                                background-color: #FF6B6B;
+                                color: white;
+                                border-radius: 8px;
+                                border: none;
+                                width: 220px;
+                                margin: 16px auto;
+                                display: block;
+                            }
+                            button:hover {
+                                background-color: #FF4C4C;
+                            }
+                            """
+                        ):
+                            cancel_button = st.button(
+                                "🚫 생성 취소",
+                                key="cancel_generation",
+                                help="현재 진행 중인 이미지 생성을 취소합니다"
+                            )
 
                         result = self.webhook_handler.get_image_links(generated_id)
                         if result["success"] and result["images"]:
@@ -328,12 +316,12 @@ def main():
             key="header_container",
             css_styles="""
             {
-                background: linear-gradient(135deg, #f6f8fb 0%, #ffffff 100%);
-                padding: 2em;
-                border-radius: 1em;
-                margin-bottom: 2em;
+                background: linear-gradient(135deg, #dff6ff 0%, #ffffff 100%);
+                padding: 24px;
+                border-radius: 16px;
+                margin-bottom: 24px;
                 text-align: center;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
             }
             """
         ):
@@ -357,11 +345,12 @@ def main():
                 key="intro_container",
                 css_styles="""
                 {
-                    background-color: #f8fafc;
-                    padding: 1.5em;
-                    border-radius: 1em;
-                    border: 1px solid #e2e8f0;
-                    margin-bottom: 2em;
+                    background-color: #e3f9ff;
+                    padding: 24px;
+                    border-radius: 16px;
+                    border: 1px solid #b6e3f3;
+                    margin-bottom: 24px;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
                 }
                 """
             ):
@@ -378,17 +367,18 @@ def main():
             if 'messages' not in st.session_state:
                 st.session_state.messages = []
             
+            # 기존 메시지 출력 후 새로운 입력 메시지 출력
             for message in st.session_state.messages:
                 with stylable_container(
                     key=f"message_{hash(str(message))}",
                     css_styles=f"""
                     {{
-                        background-color: {'#e3f2fd' if message["role"] == "user" else '#ffffff'};
-                        padding: 1em;
-                        border-radius: 1em;
-                        margin: 0.5em 0;
-                        border: 1px solid #e2e8f0;
-                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                        background-color: {'#d3eefa' if message["role"] == "user" else '#ffffff'};
+                        padding: 16px;
+                        border-radius: 12px;
+                        margin: 8px 0;
+                        border: 1px solid #b6e3f3;
+                        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
                     }}
                     """
                 ):
@@ -403,16 +393,16 @@ def main():
                                     css_styles="""
                                     {
                                         background-color: #ffffff;
-                                        padding: 1em;
-                                        border-radius: 1em;
-                                        margin: 1em 0;
-                                        border: 1px solid #e2e8f0;
-                                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                                        padding: 16px;
+                                        border-radius: 16px;
+                                        margin: 16px 0;
+                                        border: 1px solid #b6e3f3;
+                                        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
                                         transition: transform 0.2s ease;
                                     }
                                     :hover {
                                         transform: translateY(-5px);
-                                        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                                        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
                                     }
                                     """
                                 ):
@@ -426,15 +416,15 @@ def main():
                                                 key=f"download_button_{idx}_{hash(url)}",
                                                 css_styles="""
                                                 button {
-                                                    background-color: #4299e1;
+                                                    background-color: #1c7ed6;
                                                     color: white;
-                                                    border-radius: 0.5em;
+                                                    border-radius: 8px;
                                                     border: none;
                                                     width: 100%;
-                                                    padding: 0.5em;
+                                                    padding: 8px;
                                                 }
                                                 button:hover {
-                                                    background-color: #3182ce;
+                                                    background-color: #1864ab;
                                                 }
                                                 """
                                             ):
@@ -452,131 +442,132 @@ def main():
                                                 key=f"view_button_{idx}_{hash(url)}",
                                                 css_styles="""
                                                 button {
-                                                    background-color: #48bb78;
+                                                    background-color: #38a169;
                                                     color: white;
-                                                    border-radius: 0.5em;
+                                                    border-radius: 8px;
                                                     border: none;
                                                     width: 100%;
-                                                    padding: 0.5em;
+                                                    padding: 8px;
                                                 }
                                                 button:hover {
-                                                    background-color: #38a169;
+                                                    background-color: #2f855a;
                                                 }
                                                 """
                                             ):
-                                                st.markdown(f'<a href="{url}" target="_blank"><button style="width:100%;padding:0.5em;">🔍 크게 보기</button></a>', unsafe_allow_html=True)
+                                                st.markdown(f'<a href="{url}" target="_blank"><button style="width:100%;padding:8px;">🔍 크게 보기</button></a>', unsafe_allow_html=True)
 
-        # 채팅 입력 영역
-        with stylable_container(
-            key="chat_input_container",
-            css_styles="""
-            {
-                background-color: #ffffff;
-                padding: 1em;
-                border-radius: 1em;
-                border: 1px solid #e2e8f0;
-                margin-top: 1em;
-                position: sticky;
-                bottom: 0;
-            }
-            .stTextInput > div > div > input {
-                border-radius: 0.5em;
-                border: 1px solid #e2e8f0;
-                padding: 0.75em;
-            }
-            .stTextInput > div > div > input:focus {
-                border-color: #4299e1;
-                box-shadow: 0 0 0 1px #4299e1;
-            }
-            """
-        ):
-            if prompt := st.chat_input("어떤 이미지를 만들어드릴까요?"):
-                st.session_state.messages.append({"role": "user", "content": prompt})
-                
-                with st.chat_message("user", avatar="👤"):
-                    st.markdown(prompt)
+            # 입력 후 생성된 메시지 출력
+            with stylable_container(
+                key="chat_input_container",
+                css_styles="""
+                {
+                    background-color: #ffffff;
+                    padding: 16px;
+                    border-radius: 16px;
+                    border: 1px solid #b6e3f3;
+                    margin-top: 16px;
+                    position: sticky;
+                    bottom: 0;
+                    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
+                }
+                .stTextInput > div > div > input {
+                    border-radius: 8px;
+                    border: 1px solid #b6e3f3;
+                    padding: 12px;
+                }
+                .stTextInput > div > div > input:focus {
+                    border-color: #1c7ed6;
+                    box-shadow: 0 0 0 1px #1c7ed6;
+                }
+                """
+            ):
+                if prompt := st.chat_input("어떤 이미지를 만들어드릴까요?"):
+                    st.session_state.messages.append({"role": "user", "content": prompt})
+                    
+                    with st.chat_message("user", avatar="👤"):
+                        st.markdown(prompt)
 
-                with st.chat_message("assistant", avatar="✨"):
                     response = assistant.process_message(prompt)
                     
                     if response["status"] == "success":
-                        st.markdown(response["response"])
-                        message = {"role": "assistant", "content": response["response"]}
-                        
-                        if "images" in response and response["images"]:
-                            message["image_urls"] = response["images"]
-                            cols = st.columns(2)
-                            for idx, url in enumerate(response["images"]):
-                                with cols[idx % 2]:
-                                    with stylable_container(
-                                        key=f"new_image_container_{idx}_{hash(url)}",
-                                        css_styles="""
-                                        {
-                                            background-color: #ffffff;
-                                            padding: 1em;
-                                            border-radius: 1em;
-                                            margin: 1em 0;
-                                            border: 1px solid #e2e8f0;
-                                            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-                                            transition: transform 0.2s ease;
-                                        }
-                                        :hover {
-                                            transform: translateY(-5px);
-                                            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                                        }
-                                        """
-                                    ):
-                                        image = load_image(url)
-                                        if image:
-                                            st.image(image, use_column_width=True)
-                                            
-                                            col1, col2 = st.columns(2)
-                                            with col1:
-                                                with stylable_container(
-                                                    key=f"new_download_button_{idx}_{hash(url)}",
-                                                    css_styles="""
-                                                    button {
-                                                        background-color: #4299e1;
-                                                        color: white;
-                                                        border-radius: 0.5em;
-                                                        border: none;
-                                                        width: 100%;
-                                                        padding: 0.5em;
-                                                    }
-                                                    button:hover {
-                                                        background-color: #3182ce;
-                                                    }
-                                                    """
-                                                ):
-                                                    buffer = io.BytesIO()
-                                                    image.save(buffer, format="PNG")
-                                                    btn = st.download_button(
-                                                        label="💾 다운로드",
-                                                        data=buffer.getvalue(),
-                                                        file_name=f"SF49_Design_{idx + 1}.png",
-                                                        mime="image/png"
-                                                    )
-                                            
-                                            with col2:
-                                                with stylable_container(
-                                                    key=f"new_view_button_{idx}_{hash(url)}",
-                                                    css_styles="""
-                                                    button {
-                                                        background-color: #48bb78;
-                                                        color: white;
-                                                        border-radius: 0.5em;
-                                                        border: none;
-                                                        width: 100%;
-                                                        padding: 0.5em;
-                                                    }
-                                                    button:hover {
-                                                        background-color: #38a169;
-                                                    }
-                                                    """
-                                                ):
-                                                    st.markdown(f'<a href="{url}" target="_blank"><button style="width:100%;padding:0.5em;">🔍 크게 보기</button></a>', unsafe_allow_html=True)
+                        with st.chat_message("assistant", avatar="✨"):
+                            st.markdown(response["response"])
+                            message = {"role": "assistant", "content": response["response"]}
                             
-                        st.session_state.messages.append(message)
+                            if "images" in response and response["images"]:
+                                message["image_urls"] = response["images"]
+                                cols = st.columns(2)
+                                for idx, url in enumerate(response["images"]):
+                                    with cols[idx % 2]:
+                                        with stylable_container(
+                                            key=f"new_image_container_{idx}_{hash(url)}",
+                                            css_styles="""
+                                            {
+                                                background-color: #ffffff;
+                                                padding: 16px;
+                                                border-radius: 16px;
+                                                margin: 16px 0;
+                                                border: 1px solid #b6e3f3;
+                                                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+                                                transition: transform 0.2s ease;
+                                            }
+                                            :hover {
+                                                transform: translateY(-5px);
+                                                box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+                                            }
+                                            """
+                                        ):
+                                            image = load_image(url)
+                                            if image:
+                                                st.image(image, use_column_width=True)
+                                                
+                                                col1, col2 = st.columns(2)
+                                                with col1:
+                                                    with stylable_container(
+                                                        key=f"new_download_button_{idx}_{hash(url)}",
+                                                        css_styles="""
+                                                        button {
+                                                            background-color: #1c7ed6;
+                                                            color: white;
+                                                            border-radius: 8px;
+                                                            border: none;
+                                                            width: 100%;
+                                                            padding: 8px;
+                                                        }
+                                                        button:hover {
+                                                            background-color: #1864ab;
+                                                        }
+                                                        """
+                                                    ):
+                                                        buffer = io.BytesIO()
+                                                        image.save(buffer, format="PNG")
+                                                        btn = st.download_button(
+                                                            label="💾 다운로드",
+                                                            data=buffer.getvalue(),
+                                                            file_name=f"SF49_Design_{idx + 1}.png",
+                                                            mime="image/png"
+                                                        )
+                                                
+                                                with col2:
+                                                    with stylable_container(
+                                                        key=f"new_view_button_{idx}_{hash(url)}",
+                                                        css_styles="""
+                                                        button {
+                                                            background-color: #38a169;
+                                                            color: white;
+                                                            border-radius: 8px;
+                                                            border: none;
+                                                            width: 100%;
+                                                            padding: 8px;
+                                                        }
+                                                        button:hover {
+                                                            background-color: #2f855a;
+                                                        }
+                                                        """
+                                                    ):
+                                                        st.markdown(f'<a href="{url}" target="_blank"><button style="width:100%;padding:8px;">🔍 크게 보기</button></a>', unsafe_allow_html=True)
+                            
+                            st.session_state.messages.append(message)
                     
                     elif response["status"] == "cancelled":
                         with stylable_container(
@@ -584,11 +575,12 @@ def main():
                             css_styles="""
                             {
                                 background-color: #fff5f5;
-                                color: #c53030;
-                                padding: 1em;
-                                border-radius: 0.5em;
+                                color: #e53e3e;
+                                padding: 16px;
+                                border-radius: 8px;
                                 border: 1px solid #fed7d7;
-                                margin: 1em 0;
+                                margin: 16px 0;
+                                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
                             }
                             """
                         ):
@@ -599,11 +591,12 @@ def main():
                             css_styles="""
                             {
                                 background-color: #fff5f5;
-                                color: #c53030;
-                                padding: 1em;
-                                border-radius: 0.5em;
+                                color: #e53e3e;
+                                padding: 16px;
+                                border-radius: 8px;
                                 border: 1px solid #fed7d7;
-                                margin: 1em 0;
+                                margin: 16px 0;
+                                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
                             }
                             """
                         ):
