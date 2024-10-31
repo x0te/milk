@@ -274,13 +274,36 @@ def set_custom_style():
                 top: 0 !important;
                 left: 0 !important;
                 right: 0 !important;
-                height: 20px !important;
+                height: 60px !important;
                 background-color: #FF5722 !important;
                 display: flex !important;
                 justify-content: flex-end !important;
                 align-items: center !important;
                 padding: 0 20px !important;
                 z-index: 999999 !important;
+            }
+
+            /* 아이콘 크기 조정 */
+            .nav-icon {
+                width: 40px !important;
+                height: 40px !important;
+                font-size: 1.5rem !important;
+                background: transparent !important;
+                border: none !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                margin: 0 5px !important;
+            }
+
+            /* 툴팁 위치 재조정 */
+            .nav-icon::after {
+                top: 65px !important;
+            }
+
+            /* 메인 컨텐츠 여백 조정 */
+            .main > div:first-child {
+                padding-top: 60px !important;
             }
             
             </style>
@@ -589,7 +612,7 @@ class SF49StudioAssistant:
             elif run.status == "failed":
                 return {
                     "status": "error",
-                    "response": "처리 중 문제가 발생했습니다. 다시 시도해주세��."
+                    "response": "처리 중 문제가 발생했습니다. 다시 시도해주세."
                 }
             
             time.sleep(0.5)
