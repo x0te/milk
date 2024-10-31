@@ -26,6 +26,7 @@ def apply_custom_css():
         .stAppHeader {
             background-color: #32CD32 !important;  /* 라임 그린 */
             margin-bottom: 10px;
+            margin-background: #32CD32 !important;
         }
 
         /* 네비게이션 아이콘 배경색 수정 */
