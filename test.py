@@ -23,6 +23,10 @@ def set_custom_style():
     st.markdown("""
         <style>
         /* 라이트 테마 */
+        body {
+            background-color: #FFFFFF;
+            color: #2C3E50;
+        }
         .stApp {
             background-color: #FFFFFF;
             color: #2C3E50;
@@ -91,12 +95,13 @@ def set_custom_style():
         
         /* 채팅 인터페이스 */
         .stChatMessage {
-            background: rgba(255, 255, 255, 0.95) !important;
+            background: rgba(255, 255, 255, 1.0) !important;
             border: 1px solid rgba(44, 62, 80, 0.1);
             border-radius: 8px;
             padding: 1rem;
             margin: 1rem 0;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            color: #2C3E50;
         }
         
         .stChatMessage:hover {
@@ -105,7 +110,7 @@ def set_custom_style():
         
         /* 입력 필드 */
         .stTextInput > div > div > input {
-            background: rgba(255, 255, 255, 0.95);
+            background: #FFFFFF;
             border: 1px solid rgba(44, 62, 80, 0.1);
             padding: 0.8rem 1rem;
             border-radius: 6px;
@@ -136,12 +141,13 @@ def set_custom_style():
         }
         
         .intro-text {
-            background: rgba(255, 255, 255, 0.95);
+            background: #FFFFFF;
             padding: 1.5rem;
             border-radius: 8px;
             border: 1px solid rgba(44, 62, 80, 0.1);
             margin: 1rem 0 2rem 0;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            color: #2C3E50;
         }
         
         /* 이미지 스타일 */
@@ -150,7 +156,7 @@ def set_custom_style():
             transition: all 0.3s ease;
             position: relative;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            background: white;
+            background: #FFFFFF;
             padding: 0.5rem;
             border-radius: 8px;
         }
@@ -214,7 +220,7 @@ def set_custom_style():
         }
         
         header[data-testid="stHeader"] {
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 1.0);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(44, 62, 80, 0.1);
         }
