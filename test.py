@@ -256,8 +256,12 @@ def set_custom_style():
             /* 헤더 기본 스타일 수정 */
             .stAppHeader {
                 background-color: #FF5722 !important;
-                height: 4px !important;
+                height: 20px !important;
                 padding: 0 !important;
+                min-height: 20px !important;
+                max-height: 20px !important;
+                margin: 0 !important;
+                border: none !important;
             }
 
             /* 헤더 내부 모든 요소 숨기기 */
