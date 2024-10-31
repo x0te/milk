@@ -700,7 +700,7 @@ def main():
     ):
         # 인트로 메시지
         if 'shown_intro' not in st.session_state:
-            with st.chat_message("assistant", avatar="🎨"):
+            with st.chat_message("assistant"):
                 st.markdown("""
                     <div style='color: #1F2937;'>
                         <h3 style='margin: 0 0 0.5rem 0; font-weight: 600;'>환영합니다! 👋</h3>
