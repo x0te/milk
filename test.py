@@ -28,13 +28,28 @@ def apply_custom_css():
 
         /* 네비게이션 아이콘 */
         .nav-icon {
-            background-color: #FF6B00 !important;
-            border: 1px solid rgba(255, 107, 0, 0.3) !important;
+            background-color: rgba(255, 107, 0, 0.1) !important;
+            border: 2px solid #FF6B00 !important;
+            padding: 8px 12px !important;
+            border-radius: 50px !important;
+            color: #FF6B00 !important;
+            text-decoration: none !important;
+            font-size: 1.2rem !important;
+            margin: 0 4px !important;
+            transition: all 0.3s ease !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 40px !important;
+            height: 40px !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
         }
 
         .nav-icon:hover {
-            background: rgba(50, 205, 50, 0.4) !important;
-            border-color: rgba(50, 205, 50, 0.5) !important;
+            background-color: #FF6B00 !important;
+            color: white !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 8px rgba(255, 107, 0, 0.2) !important;
         }
 
         /* 채팅 입력 */
@@ -622,7 +637,7 @@ def main():
                 progress_messages = [
                     "🎨 디자인 컨셉을 구상 중입니다...",
                     "✨ 시각적 요소를 배치하고 있습니다...",
-                    "🖌️ 디테일을 다듬고 있습니다...",
+                    "🖌️ 디테일을 다듬�� 있습니다...",
                     "🔍 최종 점검 중입니다...",
                     "✅ 마무리 작업을 진행 중입니다..."
                 ]
