@@ -25,7 +25,7 @@ def apply_custom_css():
         /* 스트림릿 헤더 스타일 수정 */
         .stAppHeader {
             background-color: #32CD32 !important;  /* 라임 그린 */
-            padding-bottom: 0.5rem;
+            margin-bottom: 0.5rem;
         }
 
         /* 네비게이션 아이콘 배경색 수정 */
