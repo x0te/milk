@@ -22,32 +22,6 @@ def set_custom_style():
         """
     ):
         st.markdown("""
-            <div class="nav-container">
-                <a href="https://sf49.studio/" 
-                   target="_blank" 
-                   class="nav-icon"
-                   data-tooltip="SF49 Studio">
-                    🏠
-                </a>
-                <a href="https://sf49.studio/guide" 
-                   target="_blank" 
-                   class="nav-icon"
-                   data-tooltip="이용 가이드">
-                    📖
-                </a>
-                <a href="https://sf49.studio/pricing" 
-                   target="_blank" 
-                   class="nav-icon"
-                   data-tooltip="요금제 안내">
-                    💳
-                </a>
-                <a href="https://sf49.studio/contact" 
-                   target="_blank" 
-                   class="nav-icon"
-                   data-tooltip="문의하기">
-                    ✉️
-                </a>
-            </div>
             <style>
             /* Streamlit 메인 컨테이너 배경색 오버라이드 */
             .st-emotion-cache-1jicfl2 {
@@ -60,26 +34,38 @@ def set_custom_style():
             
             /* 네비게이션 컨테이너 */
             .nav-container {
-                position: static !important;
-                top: auto !important;
-                right: 20px !important;
-                padding: 0 20px !important;
-                background: transparent !important;
+                position: fixed;
+                top: 4.5rem;  /* Streamlit 헤더 고려 */
+                right: 20px;
+                z-index: 1000;
+                display: flex;
+                gap: 0.5rem;
+                background: transparent;
             }
 
             /* 아이콘 버튼 */
             .nav-icon {
-                width: 24px !important;
-                height: 24px !important;
-                font-size: 1rem !important;
-                background: transparent !important;
-                border: none !important;
+                width: 40px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 50%;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                backdrop-filter: blur(10px);
+                font-size: 1.2rem;
+                text-decoration: none;
+                color: rgba(255, 255, 255, 0.8);
+                position: relative;
+                border: 1px solid rgba(255, 255, 255, 0.1);
             }
 
             .nav-icon:hover {
-                background: rgba(255, 255, 255, 0.2) !important;
-                transform: translateY(0) !important;
-                border: none !important;
+                background: rgba(255, 75, 75, 0.2);
+                transform: translateY(-2px);
+                border-color: rgba(255, 75, 75, 0.3);
             }
 
             /* 툴팁 */
@@ -87,7 +73,7 @@ def set_custom_style():
                 content: attr(data-tooltip);
                 position: absolute;
                 right: 50px;
-                top: 25px !important;
+                top: 50%;
                 transform: translateY(-50%);
                 background: rgba(0, 0, 0, 0.8);
                 color: white;
@@ -266,50 +252,6 @@ def set_custom_style():
                 border-top: 1px solid rgba(255, 255, 255, 0.1);
                 z-index: 1000;
             }
-
-            /* 헤더 기본 스타일 수정 */
-            .stAppHeader {
-                background-color: #FF5722 !important;
-                height: 20px !important;
-                padding: 0 !important;
-                min-height: 20px !important;
-                margin: 0 !important;
-                border: none !important;
-                display: flex !important;
-                justify-content: flex-end !important;
-                align-items: center !important;
-            }
-
-            /* 헤더 내부 모든 요소 숨기기 */
-            .stToolbarActions,
-            .stMainMenu,
-            .stDecoration,
-            .stToolbar,
-            [data-testid="stToolbarActions"],
-            [data-testid="stMainMenu"],
-            [data-testid="stDecoration"],
-            [data-testid="stToolbar"] {
-                display: none !important;
-                visibility: hidden !important;
-            }
-
-            /* 헤더 버튼 및 아이콘 제거 */
-            .stAppHeader button,
-            .stAppHeader svg,
-            .stToolbarActionButton,
-            .stBaseButton-header,
-            .stBaseButton-headerNoPadding {
-                display: none !important;
-                visibility: hidden !important;
-            }
-
-            /* 헤더 높이와 여백 조정 */
-            .stAppHeader {
-                min-height: 20px !important;
-                max-height: 20px !important;
-                margin: 0 !important;
-                border: none !important;
-            }
             
             </style>
         """, unsafe_allow_html=True)
@@ -456,7 +398,7 @@ class SF49StudioAssistant:
             response.raise_for_status()
             return {
                 "success": True,
-                "message": "이���지 생성이 시작되었습니다",
+                "message": "이미지 생성이 시작되었습니다",
                 "unique_id": unique_id
             }
         except requests.exceptions.RequestException as e:
