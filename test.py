@@ -253,6 +253,36 @@ def set_custom_style():
                 z-index: 1000;
             }
             
+            /* Streamlit 기본 헤더 완전히 제거 */
+            .stAppHeader,
+            header[data-testid="stHeader"],
+            .stHeader,
+            header.st-emotion-cache-8ahh38,
+            header.ezrtsby2 {
+                display: none !important;
+                visibility: hidden !important;
+                height: 0 !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
+            }
+
+            /* 네비게이션 컨테이너를 최상단에 고정 */
+            .nav-container {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                height: 20px !important;
+                background-color: #FF5722 !important;
+                display: flex !important;
+                justify-content: flex-end !important;
+                align-items: center !important;
+                padding: 0 20px !important;
+                z-index: 999999 !important;
+            }
+            
             </style>
         """, unsafe_allow_html=True)
 
@@ -559,7 +589,7 @@ class SF49StudioAssistant:
             elif run.status == "failed":
                 return {
                     "status": "error",
-                    "response": "처리 중 문제가 발생했습니다. 다시 시도해주세요."
+                    "response": "처리 중 문제가 발생했습니다. 다시 시도해주세��."
                 }
             
             time.sleep(0.5)
