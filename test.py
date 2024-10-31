@@ -550,35 +550,6 @@ class SF49StudioAssistant:
                             progress_bar.empty()
                             status_text.empty()
 
-                        with stylable_container(
-                            key="cancel_button_container",
-                            css_styles="""
-                            {
-                                max-width: 800px;
-                                margin: 0 auto;
-                            }
-                            button {
-                                background-color: #DC2626;
-                                color: white;
-                                border-radius: 6px;
-                                border: none;
-                                padding: 0.75rem;
-                                width: 100%;
-                                margin-top: 0.5rem;
-                                transition: all 0.2s;
-                            }
-                            button:hover {
-                                background-color: #B91C1C;
-                                transform: translateY(-1px);
-                            }
-                            """
-                        ):
-                            cancel_button = st.button(
-                                "🚫 생성 취소",
-                                key="cancel_generation",
-                                help="현재 진행 중인 이미지 생성을 취소합니다"
-                            )
-
                         result = self.webhook_handler.get_image_links(generated_id)
                         if result["success"] and result["images"]:
                             st.balloons()
