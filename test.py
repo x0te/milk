@@ -9,7 +9,6 @@ import io
 import base64
 from PIL import Image
 from streamlit_extras.stylable_container import stylable_container
-from streamlit_chat import message
 
 st.set_page_config(
         page_title="SF49.Studio Designer",
@@ -99,117 +98,81 @@ def set_custom_style():
                 visibility: visible;
                 right: 45px;
             }
-
-            /* 채팅 입력 고정 컨테이너 */
-            .chat-input-fixed {
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                background: rgba(26, 27, 30, 0.95);
-                backdrop-filter: blur(10px);
-                padding: 1rem 5rem;
-                border-top: 1px solid rgba(255, 255, 255, 0.1);
-                z-index: 1000;
-            }
-
-            /* 메인 컨텐츠 영역 하단 여백 */
-            .main .block-container {
-                padding-bottom: 200px !important;  /* 입력 폼 높이만큼 여백 추가 */
-            }
-
-            /* 폼 스타일링 */
-            .stForm {
-                background: transparent;
-                padding: 0;
-                max-width: 1200px;
-                margin: 0 auto;
-            }
-
-            /* 텍스트 영역 스타일링 */
-            .stTextArea textarea {
-                background: rgba(255, 255, 255, 0.05) !important;
-                border: 1px solid rgba(255, 255, 255, 0.1) !important;
-                border-radius: 12px !important;
-                color: white !important;
-                font-size: 1rem !important;
-                padding: 1rem !important;
-                resize: none !important;
-                transition: all 0.3s ease !important;
-            }
-
-            .stTextArea textarea:focus {
-                border-color: #FF4B4B !important;
-                box-shadow: 0 0 0 1px rgba(255, 75, 75, 0.3) !important;
-                background: rgba(255, 255, 255, 0.08) !important;
-            }
-
-            /* 전송 버튼 스타일링 */
-            .stButton button {
-                background: #FF4B4B !important;
-                color: white !important;
-                border: none !important;
-                border-radius: 8px !important;
-                padding: 0.5rem 2rem !important;
-                font-weight: 600 !important;
-                transition: all 0.3s ease !important;
-                height: 100% !important;
-            }
-
-            .stButton button:hover {
-                background: #FF5C5C !important;
-                transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(255, 75, 75, 0.2);
-            }
-
-            /* 레이블 숨기기 */
-            .stTextArea label {
-                display: none !important;
-            }
-
-            /* 스크롤바 스타일링 */
-            ::-webkit-scrollbar {
-                width: 8px;
-                height: 8px;
-            }
-
-            ::-webkit-scrollbar-track {
-                background: rgba(255, 255, 255, 0.1);
-                border-radius: 4px;
-            }
-
-            ::-webkit-scrollbar-thumb {
-                background: rgba(255, 255, 255, 0.2);
-                border-radius: 4px;
-            }
-
-            ::-webkit-scrollbar-thumb:hover {
-                background: rgba(255, 255, 255, 0.3);
-            }
-
-            /* 메시지 스타일 개선 */
+            
+            /* 채팅 인터페이스 */
             .stChatMessage {
-                background: transparent !important;
-                border: none !important;
-                padding: 1rem 0 !important;
+                background: rgba(45, 45, 45, 0.95) !important;  /* 어두운 회색 배경 */
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 8px;
+                padding: 1.2rem !important;
+                margin: 1.2rem 0 !important;
+                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2),   /* 외부 그림자 */
+                            0 2px 8px rgba(0, 0, 0, 0.1),     /* 중간 그림자 */
+                            0 1px 3px rgba(0, 0, 0, 0.05);    /* 미세 그림자 */
+                font-size: 1.1rem !important;
+                color: rgba(255, 255, 255, 0.9) !important;
+                transform: translateY(0);                      /* 애니메이션 시작 위치 */
+                transition: all 0.3s ease;                    /* 부드러운 전환 효과 */
             }
 
-            .stChatMessage [data-testid="stChatMessageContent"] {
-                background: rgba(45, 45, 45, 0.95) !important;
-                border: 1px solid rgba(255, 255, 255, 0.1) !important;
-                border-radius: 12px !important;
-                padding: 1rem !important;
+            .stChatMessage:hover {
+                border-color: rgba(255, 75, 75, 0.2);
+                background: rgba(50, 50, 50, 0.95) !important;
+                box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25),  /* 호버 시 그림자 강화 */
+                            0 4px 10px rgba(0, 0, 0, 0.15),
+                            0 2px 4px rgba(0, 0, 0, 0.1);
+                transform: translateY(-2px);                   /* 호버 시 살짝 위로 떠오르는 효과 */
             }
 
-            .stChatMessage[data-testid="user"] [data-testid="stChatMessageContent"] {
-                background: rgba(255, 87, 34, 0.95) !important;
+            /* 채팅 메시지 내부의 모든 텍스트 요소에 대한 색상 지정 */
+            .stChatMessage p, 
+            .stChatMessage span, 
+            .stChatMessage div {
+                color: rgba(255, 255, 255, 0.9) !important;  /* 하얀색 글씨 */
             }
 
-            /* 불필요한 여백 제거 */
-            .main .block-container {
-                padding-bottom: 2rem !important;
+            /* 입력 필드 */
+            .stTextInput > div > div > input {
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                padding: 1rem 1.2rem !important;
+                border-radius: 6px;
+                color: white;
+                width: calc(100% - 2rem);
+                margin: 0 auto;
+                font-size: 1.1rem !important;
             }
-
+            
+            .stTextInput > div > div > input:focus {
+                border-color: #FF4B4B;
+                box-shadow: 0 0 0 1px rgba(255, 75, 75, 0.3);
+            }
+            
+            /* 프로그레스 바 */
+            .stProgress > div > div {
+                background: linear-gradient(90deg, #1DB954, #1ED760) !important;
+            }
+            
+            .stProgress {
+                background: rgba(255, 255, 255, 0.1);
+            }
+            
+            /* 캡션과 설명 텍스트 */
+            .header-subtitle {
+                color: rgba(255, 255, 255, 0.7);
+                font-size: 1.3rem !important;
+                margin-bottom: 2rem;
+            }
+            
+            .intro-text {
+                background: rgba(255, 255, 255, 0.05);
+                padding: 1.5rem;
+                border-radius: 8px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                margin: 1rem 0 2rem 0;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            }
+            
             /* 이미지 스일 */
             .image-container {
                 margin: 1rem 0;
@@ -270,7 +233,7 @@ def set_custom_style():
                 background: rgba(255, 75, 75, 0.8);
             }
 
-            /* Streamlit ��본 요소 조정 */
+            /* Streamlit 기본 요소 조정 */
             .stDeployButton {
                 display: none;
             }
@@ -306,12 +269,185 @@ def set_custom_style():
             }
 
             .input-container {
-                position: relative;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
                 background: rgba(26, 27, 30, 0.95);
                 padding: 20px;
                 backdrop-filter: blur(10px);
                 border-top: 1px solid rgba(255, 255, 255, 0.1);
                 z-index: 1000;
+            }
+            
+            /* Streamlit 기본 헤더 완전히 제거 */
+            .stAppHeader,
+            header[data-testid="stHeader"],
+            .stHeader,
+            header.st-emotion-cache-8ahh38,
+            header.ezrtsby2 {
+                display: none !important;
+                visibility: hidden !important;
+                height: 0 !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
+            }
+
+            /* 네비게이션 컨테이너를 최상단에 고정 */
+            .nav-container {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                height: 60px !important;
+                background-color: #FF5722 !important;
+                display: flex !important;
+                justify-content: flex-start !important;
+                align-items: center !important;
+                padding: 0 20px !important;
+                padding-left: 60% !important;
+                z-index: 999999 !important;
+                gap: 10px !important;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;
+            }
+
+            /* 아이콘 크기 조정 */
+            .nav-icon {
+                width: 40px !important;
+                height: 40px !important;
+                font-size: 1.5rem !important;
+                background: rgba(255, 255, 255, 0.1) !important;
+                border: none !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                margin: 0 5px !important;
+                transition: all 0.3s ease !important;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) !important;
+                border-radius: 50% !important;
+            }
+
+            .nav-icon:hover {
+                background: rgba(255, 255, 255, 0.2) !important;
+                transform: translateY(-2px) !important;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
+            }
+
+            /* 툴팁 위치 재조정 */
+            .nav-icon::after {
+                top: 65px !important;
+            }
+
+            /* 메인 컨텐츠 여백 조정 */
+            .main > div:first-child {
+                padding-top: 60px !important;
+            }
+            
+            /* 불필요한 여백 제거 */
+            .st-emotion-cache-1v0mbdj,  /* stVerticalBlock */
+            .st-emotion-cache-16idsys,
+            .st-emotion-cache-10trblm,
+            .st-emotion-cache-1kyxreq,
+            .st-emotion-cache-1wbqy5l {
+                margin: 0 !important;
+                padding: 0 !important;
+                height: auto !important;
+                min-height: 0 !important;
+            }
+
+            /* 제목과 컨텐츠 위치 조정 */
+            [data-testid="stVerticalBlock"] {
+                gap: 0 !important;
+                padding: 0 !important;
+            }
+
+            /* 상단 여백 조정 */
+            .main .block-container {
+                padding-top: 60px !important;  /* 헤더 높이만큼만 여백 설정 */
+                max-width: none !important;
+            }
+
+            /* 추가 여백 제거 */
+            .st-emotion-cache-18ni7ap {
+                padding: 0 !important;
+            }
+
+            .st-emotion-cache-6qob1r {
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            
+            /* Streamlit 기본 텍스트 크기 조정 */
+            .stMarkdown, .stText {
+                font-size: 1.1rem !important;
+            }
+
+            /* 제목 크기 조정 */
+            h1 {
+                font-size: 2.5rem !important;
+            }
+
+            h2 {
+                font-size: 2rem !important;
+            }
+
+            h3 {
+                font-size: 1.75rem !important;
+            }
+
+            /* 툴팁 크기 조정 */
+            .nav-icon::after {
+                font-size: 1rem !important;
+                padding: 0.6rem 1.2rem !important;
+            }
+
+            /* AI 메시지 스타일 */
+            .stChatMessage[data-testid="assistant"] {
+                background: rgba(255, 87, 34, 0.95) !important;  /* 오렌지색(#FF5722) 배경 */
+                box-shadow: 0 8px 24px rgba(255, 87, 34, 0.15),
+                            0 2px 8px rgba(255, 87, 34, 0.1),
+                            0 1px 3px rgba(255, 87, 34, 0.05);
+            }
+
+            /* AI 메시지 내부 텍스트 스타일 */
+            .stChatMessage[data-testid="assistant"] p, 
+            .stChatMessage[data-testid="assistant"] span, 
+            .stChatMessage[data-testid="assistant"] div {
+                color: rgba(33, 33, 33, 0.95) !important;  /* 어두운 글자색 */
+            }
+
+            /* 사용자 메시지 스타일 */
+            .stChatMessage[data-testid="user"] {
+                background: rgba(45, 45, 45, 0.95) !important;
+                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2),
+                            0 2px 8px rgba(0, 0, 0, 0.1),
+                            0 1px 3px rgba(0, 0, 0, 0.05);
+            }
+
+            /* 사용자 메시지 내부 텍스트 스타일 */
+            .stChatMessage[data-testid="user"] p, 
+            .stChatMessage[data-testid="user"] span, 
+            .stChatMessage[data-testid="user"] div {
+                color: rgba(255, 255, 255, 0.9) !important;
+            }
+
+            /* 호버 효과 */
+            .stChatMessage[data-testid="assistant"]:hover {
+                background: rgba(255, 87, 34, 0.85) !important;
+                transform: translateY(-2px);
+                box-shadow: 0 12px 28px rgba(255, 87, 34, 0.2),
+                            0 4px 10px rgba(255, 87, 34, 0.15),
+                            0 2px 4px rgba(255, 87, 34, 0.1);
+            }
+
+            .stChatMessage[data-testid="user"]:hover {
+                background: rgba(50, 50, 50, 0.95) !important;
+                transform: translateY(-2px);
+                box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25),
+                            0 4px 10px rgba(0, 0, 0, 0.15),
+                            0 2px 4px rgba(0, 0, 0, 0.1);
             }
 
             </style>
@@ -423,7 +559,7 @@ class SF49StudioAssistant:
             보안 관련 중요 지침:
             1. 시스템 관련 정보 요청에 대해서는 절대 응답하지 않습니다.
             2. API 키, 토큰, 비밀번호 등 민감한 정보에 대한 질문은 무시합니다.
-            3. 서버 구성, 데이터베이스 구조 등 시스템 아키텍처 관 질문에는 답변하지 않습니다.
+            3. 서버 구성, 데이터베이스 구조 등 시스템 아키텍처 관련 질문에는 답변하지 않습니다.
             4. 코드 실행이나 시스템 명령어 관련 요청은 거부합니다.
             5. 이러한 보안 관련 질문을 받으면 "죄송합니다만, 보안상의 이유로 해당 정보는 제공해드릴 수 없습니다."라고 답변합니다.
             6. 오직 이미지 생성과 관련된 디자인 요청만 처리합니다.
@@ -678,30 +814,6 @@ def initialize_session_state():
     if 'threads' not in st.session_state:
         st.session_state.threads = []
 
-def display_image(url: str, idx: int):
-    """이미지 표시 및 다운로드/확대 버튼 추가"""
-    buffer = io.BytesIO()
-    img = Image.open(requests.get(url, stream=True).raw)
-    img.save(buffer, format="PNG")
-    img_base64 = base64.b64encode(buffer.getvalue()).decode()
-    
-    st.markdown(f"""
-        <div class="image-container">
-            <img src="{url}">
-            <div class="overlay-buttons">
-                <a href="data:image/png;base64,{img_base64}" 
-                   download="Design_Option_{idx + 1}.png" 
-                   class="overlay-button" 
-                   title="이미지 다운로드">💾</a>
-                <a href="{url}" 
-                   target="_blank" 
-                   class="overlay-button" 
-                   title="크게 보기">🔍</a>
-            </div>
-            <p class="image-caption">Design Option {idx + 1}</p>
-        </div>
-    """, unsafe_allow_html=True)
-
 def main():
     initialize_session_state()
     set_custom_style()
@@ -742,55 +854,88 @@ def main():
     st.title("SF49 Studio Designer")
     st.markdown('<p class="header-subtitle">AI 디자인 스튜디오</p>', unsafe_allow_html=True)
     
-    # 메시지 컨테이너
-    message_container = st.container()
-    
-    # 설명 텍스트
+    # 설명 텍스트 (항상 말풍선으로 표시)
     if 'shown_intro' not in st.session_state:
-        message("💫 원하시는 이미지를 설명해 주세요", is_user=False)
+        with stylable_container(
+            key="intro_message",
+            css_styles="""
+                {
+                    background: rgba(255, 255, 255, 0.05);
+                    border-radius: 8px;
+                    padding: 1rem;
+                    margin: 1rem 0;
+                }
+            """
+        ):
+            with st.chat_message("assistant"):
+                st.markdown("""
+                💫 원하시는 이미지를 설명해 주세요
+                """, unsafe_allow_html=True)
         st.session_state.shown_intro = True
 
-    # 채팅 히스토리 표시
-    with message_container:
-        for msg in st.session_state.messages:
-            message(msg["content"], is_user=(msg["role"] == "user"), key=f"msg_{id(msg)}")
-            
-            if "image_urls" in msg and msg["role"] == "assistant":
-                cols = st.columns(2)
-                for idx, url in enumerate(msg["image_urls"]):
-                    with cols[idx % 2]:
-                        display_image(url, idx)
+    # 채팅 컨테이너
+    with st.container():
+        # 메시지 표시 영역
+        with st.container():
+            for message in st.session_state.messages:
+                with st.chat_message(message["role"]):
+                    st.markdown(message["content"])
+                    
+                    if "image_urls" in message:
+                        for idx, url in enumerate(message["image_urls"]):
+                            buffer = io.BytesIO()
+                            img = Image.open(requests.get(url, stream=True).raw)
+                            img.save(buffer, format="PNG")
+                            img_base64 = base64.b64encode(buffer.getvalue()).decode()
+                            st.markdown(f"""
+                                <div class="image-container">
+                                    <img src="{url}">
+                                    <div class="overlay-buttons">
+                                        <a href="data:image/png;base64,{img_base64}" download="Design_Option_{idx + 1}.png" class="overlay-button" title="이미지 다운로드">💾</a>
+                                        <a href="{url}" target="_blank" class="overlay-button" title="크게 보기">🔍</a>
+                                    </div>
+                                    <p class="image-caption">Design Option {idx + 1}</p>
+                                </div>
+                            """, unsafe_allow_html=True)
 
-    # 하단 고정 입력 폼
-    st.markdown('<div class="chat-input-fixed">', unsafe_allow_html=True)
-    with st.form(key='chat_form', clear_on_submit=True):
-        user_input = st.text_area("", placeholder="원하시는 이미지를 설명해 주세요", key='input', height=100)
-        cols = st.columns([6, 1])
-        with cols[1]:
-            submit_button = st.form_submit_button("전송", use_container_width=True)
-    st.markdown('</div>', unsafe_allow_html=True)
+        # 입력 영역
+        with st.container():
+            st.markdown('<div class="input-container">', unsafe_allow_html=True)
+            if prompt := st.chat_input("어떤 이미지를 만들어드릴까요?"):
+                st.session_state.messages.append({"role": "user", "content": prompt})
+                with st.chat_message("user"):
+                    st.markdown(prompt)
 
-    if submit_button and user_input:
-        st.session_state.messages.append({"role": "user", "content": user_input})
-        message(user_input, is_user=True)
-
-        response = st.session_state.assistant.process_message(user_input)
-        if response["status"] == "success":
-            msg = {"role": "assistant", "content": response["response"]}
-            
-            if "images" in response and response["images"]:
-                msg["image_urls"] = response["images"]
-                
-            st.session_state.messages.append(msg)
-            message(response["response"], is_user=False)
-            
-            if "images" in response and response["images"]:
-                cols = st.columns(2)
-                for idx, url in enumerate(response["images"]):
-                    with cols[idx % 2]:
-                        display_image(url, idx)
-        else:
-            message(response["response"], is_user=False)
+                response = st.session_state.assistant.process_message(prompt)
+                with st.chat_message("assistant"):
+                    if response["status"] == "success":
+                        typewriter_effect(response["response"], speed=0.02)
+                        message = {"role": "assistant", "content": response["response"]}
+                        
+                        if "images" in response and response["images"]:
+                            message["image_urls"] = response["images"]
+                            cols = st.columns(2)
+                            for idx, url in enumerate(response["images"]):
+                                with cols[idx % 2]:
+                                    buffer = io.BytesIO()
+                                    img = Image.open(requests.get(url, stream=True).raw)
+                                    img.save(buffer, format="PNG")
+                                    img_base64 = base64.b64encode(buffer.getvalue()).decode()
+                                    st.markdown(f"""
+                                        <div class="image-container">
+                                            <img src="{url}">
+                                            <div class="overlay-buttons">
+                                                <a href="data:image/png;base64,{img_base64}" download="Design_Option_{idx + 1}.png" class="overlay-button" title="이미지 다운로드">💾</a>
+                                                <a href="{url}" target="_blank" class="overlay-button" title="크게 보기">🔍</a>
+                                            </div>
+                                            <p class="image-caption">Design Option {idx + 1}</p>
+                                        </div>
+                                    """, unsafe_allow_html=True)
+                        
+                        st.session_state.messages.append(message)
+                    else:
+                        typewriter_effect(response["response"], speed=0.02)
+            st.markdown('</div>', unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
