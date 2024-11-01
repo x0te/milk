@@ -450,6 +450,11 @@ def set_custom_style():
                             0 2px 4px rgba(0, 0, 0, 0.1);
             }
 
+            /* st-emotion-cache 클래스 추가 */
+            .st-emotion-cache-1wmy9hl {
+                background: transparent !important;
+            }
+
             </style>
         """, unsafe_allow_html=True)
 
