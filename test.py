@@ -259,13 +259,14 @@ def set_custom_style():
                 flex-direction: column;
                 height: calc(100vh - 200px);
                 margin-bottom: 20px;
+                position: relative;
             }
 
             .messages-container {
                 flex-grow: 1;
                 overflow-y: auto;
                 padding: 20px;
-                margin-bottom: 20px;
+                margin-bottom: 80px;
             }
 
             .input-container {
@@ -278,8 +279,22 @@ def set_custom_style():
                 backdrop-filter: blur(10px);
                 border-top: 1px solid rgba(255, 255, 255, 0.1);
                 z-index: 1000;
+                width: 100%;
+                max-width: 100%;
             }
-            
+
+            /* 채팅 입력창 위치 고정 */
+            .stChatInputContainer {
+                position: fixed !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                padding: 1rem !important;
+                background: rgba(26, 27, 30, 0.95) !important;
+                backdrop-filter: blur(10px) !important;
+                z-index: 1000 !important;
+            }
+
             /* Streamlit 기본 헤더 완전히 제거 */
             .stAppHeader,
             header[data-testid="stHeader"],
@@ -732,7 +747,7 @@ class SF49StudioAssistant:
                         "⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯",
                         "⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯",
                         "⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯",
-                        "⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯",
+                        "⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯",
                         "⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯",
                         "⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯",
                         "⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯",
