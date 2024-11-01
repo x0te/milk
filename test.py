@@ -98,39 +98,54 @@ def set_custom_style():
                 visibility: visible;
                 right: 45px;
             }
-            
-            /* 채팅 인터페이스 */
-            .stChatMessage {
-                background: rgba(45, 45, 45, 0.95) !important;  /* 어두운 회색 배경 */
-                border: 1px solid rgba(255, 255, 255, 0.1);
-                border-radius: 8px;
-                padding: 1.2rem !important;
-                margin: 1.2rem 0 !important;
-                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2),   /* 외부 그림자 */
-                            0 2px 8px rgba(0, 0, 0, 0.1),     /* 중간 그림자 */
-                            0 1px 3px rgba(0, 0, 0, 0.05);    /* 미세 그림자 */
-                font-size: 1.1rem !important;
-                color: rgba(255, 255, 255, 0.9) !important;
-                transform: translateY(0);                      /* 애니메이션 시작 위치 */
-                transition: all 0.3s ease;                    /* 부드러운 전환 효과 */
+
+            /* AI 메시지 스타일 */
+            .stChatMessage[data-testid="assistant"] {
+                background: rgba(255, 87, 34, 0.95) !important;  /* 오렌지색(#FF5722) 배경 */
+                box-shadow: 0 8px 24px rgba(255, 87, 34, 0.15),
+                            0 2px 8px rgba(255, 87, 34, 0.1),
+                            0 1px 3px rgba(255, 87, 34, 0.05);
             }
 
-            .stChatMessage:hover {
-                border-color: rgba(255, 75, 75, 0.2);
+            /* AI 메시지 내부 텍스트 스타일 */
+            .stChatMessage[data-testid="assistant"] p, 
+            .stChatMessage[data-testid="assistant"] span, 
+            .stChatMessage[data-testid="assistant"] div {
+                color: rgba(33, 33, 33, 0.95) !important;  /* 어두운 글자색 */
+            }
+
+            /* 사용자 메시지 스타일 */
+            .stChatMessage[data-testid="user"] {
+                background: rgba(45, 45, 45, 0.95) !important;
+                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2),
+                            0 2px 8px rgba(0, 0, 0, 0.1),
+                            0 1px 3px rgba(0, 0, 0, 0.05);
+            }
+
+            /* 사용자 메시지 내부 텍스트 스타일 */
+            .stChatMessage[data-testid="user"] p, 
+            .stChatMessage[data-testid="user"] span, 
+            .stChatMessage[data-testid="user"] div {
+                color: rgba(255, 255, 255, 0.9) !important;
+            }
+
+            /* 호버 효과 */
+            .stChatMessage[data-testid="assistant"]:hover {
+                background: rgba(255, 87, 34, 0.85) !important;
+                transform: translateY(-2px);
+                box-shadow: 0 12px 28px rgba(255, 87, 34, 0.2),
+                            0 4px 10px rgba(255, 87, 34, 0.15),
+                            0 2px 4px rgba(255, 87, 34, 0.1);
+            }
+
+            .stChatMessage[data-testid="user"]:hover {
                 background: rgba(50, 50, 50, 0.95) !important;
-                box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25),  /* 호버 시 그림자 강화 */
+                transform: translateY(-2px);
+                box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25),
                             0 4px 10px rgba(0, 0, 0, 0.15),
                             0 2px 4px rgba(0, 0, 0, 0.1);
-                transform: translateY(-2px);                   /* 호버 시 살짝 위로 떠오르는 효과 */
             }
-
-            /* 채팅 메시지 내부의 모든 텍스트 요소에 대한 색상 지정 */
-            .stChatMessage p, 
-            .stChatMessage span, 
-            .stChatMessage div {
-                color: rgba(255, 255, 255, 0.9) !important;  /* 하얀색 글씨 */
-            }
-
+            
             /* 입력 필드 */
             .stTextInput > div > div > input {
                 background: rgba(255, 255, 255, 0.05);
@@ -403,45 +418,6 @@ def set_custom_style():
                 padding: 0.6rem 1.2rem !important;
             }
 
-            /* AI 메시지 스타일 */
-            .stChatMessage[data-testid="assistant"] {
-                background: rgba(255, 87, 34, 0.95) !important;  /* 오렌지색(#FF5722) 배경 */
-                box-shadow: 0 8px 24px rgba(255, 87, 34, 0.15),
-                            0 2px 8px rgba(255, 87, 34, 0.1),
-                            0 1px 3px rgba(255, 87, 34, 0.05);
-            }
-
-            /* AI 메시지 내부 텍스트 스타일 */
-            .stChatMessage[data-testid="assistant"] p, 
-            .stChatMessage[data-testid="assistant"] span, 
-            .stChatMessage[data-testid="assistant"] div {
-                color: rgba(33, 33, 33, 0.95) !important;  /* 어두운 글자색 */
-            }
-
-            /* 사용자 메시지 스타일 (기존 스타일 유지) */
-            .stChatMessage[data-testid="user"] {
-                background: rgba(45, 45, 45, 0.95) !important;
-                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2),
-                            0 2px 8px rgba(0, 0, 0, 0.1),
-                            0 1px 3px rgba(0, 0, 0, 0.05);
-            }
-
-            /* 사용자 메시지 내부 텍스트 스타일 (기존 스타일 유지) */
-            .stChatMessage[data-testid="user"] p, 
-            .stChatMessage[data-testid="user"] span, 
-            .stChatMessage[data-testid="user"] div {
-                color: rgba(255, 255, 255, 0.9) !important;
-            }
-
-            /* 호버 효과 */
-            .stChatMessage[data-testid="assistant"]:hover {
-                background: rgba(255, 87, 34, 0.85) !important;  /* 약간 투명해지는 효과 */
-                transform: translateY(-2px);
-                box-shadow: 0 12px 28px rgba(255, 87, 34, 0.2),
-                            0 4px 10px rgba(255, 87, 34, 0.15),
-                            0 2px 4px rgba(255, 87, 34, 0.1);
-            }
-
             </style>
         """, unsafe_allow_html=True)
 
@@ -567,7 +543,7 @@ class SF49StudioAssistant:
                         "properties": {
                             "visualization_text": {
                                 "type": "string",
-                                "description": "인터넷 기사 썸���일 이미지를 위한 시각화 텍스트"
+                                "description": "인터넷 기사 썸네일 이미지를 위한 시각화 텍스트"
                             },
                             "unique_id": {
                                 "type": "string",
@@ -734,7 +710,7 @@ class SF49StudioAssistant:
                         "⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯",
                         "⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯",
                         "⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯",
-                        "⋯⋯⋯⋯⋯���⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯",
+                        "⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯",
                         "⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯",
                         "⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯",
                         "⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌",
@@ -861,8 +837,7 @@ def main():
         ):
             with st.chat_message("assistant"):
                 st.markdown("""
-                💫 원하시는 이미지를 설명해 주세요<br>
-                �� 최적의 디자인으로 구현해드립니다
+                💫 원하시는 이미지를 설명해 주세요
                 """, unsafe_allow_html=True)
         st.session_state.shown_intro = True
 
