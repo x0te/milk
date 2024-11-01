@@ -9,6 +9,7 @@ import io
 import base64
 from PIL import Image
 from streamlit_extras.stylable_container import stylable_container
+from streamlit_chat import message
 
 st.set_page_config(
         page_title="SF49.Studio Designer",
@@ -101,34 +102,26 @@ def set_custom_style():
             
             /* 채팅 인터페이스 */
             .stChatMessage {
-                background: rgba(45, 45, 45, 0.95) !important;  /* 어두운 회색 배경 */
-                border: 1px solid rgba(255, 255, 255, 0.1);
+                background: transparent !important;
+                border: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                box-shadow: none !important;
+            }
+            
+            .message-container {
+                display: flex;
+                align-items: flex-start;
+                gap: 1rem;
+                padding: 1rem;
+                margin: 0.5rem 0;
                 border-radius: 8px;
-                padding: 1.2rem !important;
-                margin: 1.2rem 0 !important;
-                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2),   /* 외부 그림자 */
-                            0 2px 8px rgba(0, 0, 0, 0.1),     /* 중간 그림자 */
-                            0 1px 3px rgba(0, 0, 0, 0.05);    /* 미세 그림자 */
-                font-size: 1.1rem !important;
-                color: rgba(255, 255, 255, 0.9) !important;
-                transform: translateY(0);                      /* 애니메이션 시작 위치 */
-                transition: all 0.3s ease;                    /* 부드러운 전환 효과 */
+                background: rgba(45, 45, 45, 0.95);
+                border: 1px solid rgba(255, 255, 255, 0.1);
             }
-
-            .stChatMessage:hover {
-                border-color: rgba(255, 75, 75, 0.2);
-                background: rgba(50, 50, 50, 0.95) !important;
-                box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25),  /* 호버 시 그림자 강화 */
-                            0 4px 10px rgba(0, 0, 0, 0.15),
-                            0 2px 4px rgba(0, 0, 0, 0.1);
-                transform: translateY(-2px);                   /* 호버 시 살짝 위로 떠오르는 효과 */
-            }
-
-            /* 채팅 메시지 내부의 모든 텍스트 요소에 대한 색상 지정 */
-            .stChatMessage p, 
-            .stChatMessage span, 
-            .stChatMessage div {
-                color: rgba(255, 255, 255, 0.9) !important;  /* 하얀색 글씨 */
+            
+            .message-container[data-is-user="true"] {
+                background: rgba(255, 87, 34, 0.95);
             }
 
             /* 입력 필드 */
@@ -448,6 +441,24 @@ def set_custom_style():
                 box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25),
                             0 4px 10px rgba(0, 0, 0, 0.15),
                             0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+
+            /* 폼 스타일 */
+            .stForm {
+                background: rgba(45, 45, 45, 0.95);
+                padding: 1rem;
+                border-radius: 8px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            
+            .stForm [data-baseweb="textarea"] {
+                background: rgba(255, 255, 255, 0.05);
+                border-color: rgba(255, 255, 255, 0.1);
+            }
+            
+            .stForm [data-baseweb="textarea"]:focus {
+                border-color: #FF4B4B;
+                box-shadow: 0 0 0 1px rgba(255, 75, 75, 0.3);
             }
 
             </style>
@@ -854,88 +865,68 @@ def main():
     st.title("SF49 Studio Designer")
     st.markdown('<p class="header-subtitle">AI 디자인 스튜디오</p>', unsafe_allow_html=True)
     
-    # 설명 텍스트 (항상 말풍선으로 표시)
+    # 메시지 컨테이너
+    response_container = st.container()
+    
+    # 입력 컨테이너
+    input_container = st.container()
+
+    # 설명 텍스트
     if 'shown_intro' not in st.session_state:
-        with stylable_container(
-            key="intro_message",
-            css_styles="""
-                {
-                    background: rgba(255, 255, 255, 0.05);
-                    border-radius: 8px;
-                    padding: 1rem;
-                    margin: 1rem 0;
-                }
-            """
-        ):
-            with st.chat_message("assistant"):
-                st.markdown("""
-                💫 원하시는 이미지를 설명해 주세요
-                """, unsafe_allow_html=True)
+        message("💫 원하시는 이미지를 설명해 주세요", is_user=False)
         st.session_state.shown_intro = True
 
-    # 채팅 컨테이너
-    with st.container():
-        # 메시지 표시 영역
-        with st.container():
-            for message in st.session_state.messages:
-                with st.chat_message(message["role"]):
-                    st.markdown(message["content"])
-                    
-                    if "image_urls" in message:
-                        for idx, url in enumerate(message["image_urls"]):
-                            buffer = io.BytesIO()
-                            img = Image.open(requests.get(url, stream=True).raw)
-                            img.save(buffer, format="PNG")
-                            img_base64 = base64.b64encode(buffer.getvalue()).decode()
-                            st.markdown(f"""
-                                <div class="image-container">
-                                    <img src="{url}">
-                                    <div class="overlay-buttons">
-                                        <a href="data:image/png;base64,{img_base64}" download="Design_Option_{idx + 1}.png" class="overlay-button" title="이미지 다운로드">💾</a>
-                                        <a href="{url}" target="_blank" class="overlay-button" title="크게 보기">🔍</a>
-                                    </div>
-                                    <p class="image-caption">Design Option {idx + 1}</p>
+    # 채팅 히스토리 표시
+    with response_container:
+        for msg in st.session_state.messages:
+            message(msg["content"], is_user=(msg["role"] == "user"), key=f"msg_{id(msg)}")
+            
+            if "image_urls" in msg and msg["role"] == "assistant":
+                cols = st.columns(2)
+                for idx, url in enumerate(msg["image_urls"]):
+                    with cols[idx % 2]:
+                        buffer = io.BytesIO()
+                        img = Image.open(requests.get(url, stream=True).raw)
+                        img.save(buffer, format="PNG")
+                        img_base64 = base64.b64encode(buffer.getvalue()).decode()
+                        st.markdown(f"""
+                            <div class="image-container">
+                                <img src="{url}">
+                                <div class="overlay-buttons">
+                                    <a href="data:image/png;base64,{img_base64}" download="Design_Option_{idx + 1}.png" class="overlay-button" title="이미지 다운로드">💾</a>
+                                    <a href="{url}" target="_blank" class="overlay-button" title="크게 보기">🔍</a>
                                 </div>
-                            """, unsafe_allow_html=True)
+                                <p class="image-caption">Design Option {idx + 1}</p>
+                            </div>
+                        """, unsafe_allow_html=True)
 
-        # 입력 영역
-        with st.container():
-            st.markdown('<div class="input-container">', unsafe_allow_html=True)
-            if prompt := st.chat_input("어떤 이미지를 만들어드릴까요?"):
-                st.session_state.messages.append({"role": "user", "content": prompt})
-                with st.chat_message("user"):
-                    st.markdown(prompt)
+    # 입력 영역
+    with input_container:
+        with st.form(key='chat_form', clear_on_submit=True):
+            user_input = st.text_area("메시지를 입력하세요:", key='input', height=100)
+            submit_button = st.form_submit_button("전송")
 
-                response = st.session_state.assistant.process_message(prompt)
-                with st.chat_message("assistant"):
-                    if response["status"] == "success":
-                        typewriter_effect(response["response"], speed=0.02)
-                        message = {"role": "assistant", "content": response["response"]}
-                        
-                        if "images" in response and response["images"]:
-                            message["image_urls"] = response["images"]
-                            cols = st.columns(2)
-                            for idx, url in enumerate(response["images"]):
-                                with cols[idx % 2]:
-                                    buffer = io.BytesIO()
-                                    img = Image.open(requests.get(url, stream=True).raw)
-                                    img.save(buffer, format="PNG")
-                                    img_base64 = base64.b64encode(buffer.getvalue()).decode()
-                                    st.markdown(f"""
-                                        <div class="image-container">
-                                            <img src="{url}">
-                                            <div class="overlay-buttons">
-                                                <a href="data:image/png;base64,{img_base64}" download="Design_Option_{idx + 1}.png" class="overlay-button" title="이미지 다운로드">💾</a>
-                                                <a href="{url}" target="_blank" class="overlay-button" title="크게 보기">🔍</a>
-                                            </div>
-                                            <p class="image-caption">Design Option {idx + 1}</p>
-                                        </div>
-                                    """, unsafe_allow_html=True)
-                        
-                        st.session_state.messages.append(message)
-                    else:
-                        typewriter_effect(response["response"], speed=0.02)
-            st.markdown('</div>', unsafe_allow_html=True)
+        if submit_button and user_input:
+            st.session_state.messages.append({"role": "user", "content": user_input})
+            message(user_input, is_user=True)
+
+            response = st.session_state.assistant.process_message(user_input)
+            if response["status"] == "success":
+                msg = {"role": "assistant", "content": response["response"]}
+                
+                if "images" in response and response["images"]:
+                    msg["image_urls"] = response["images"]
+                    
+                st.session_state.messages.append(msg)
+                message(response["response"], is_user=False)
+                
+                if "images" in response and response["images"]:
+                    cols = st.columns(2)
+                    for idx, url in enumerate(response["images"]):
+                        with cols[idx % 2]:
+                            display_image(url, idx)
+            else:
+                message(response["response"], is_user=False)
 
 if __name__ == "__main__":
     main()
