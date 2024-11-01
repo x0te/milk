@@ -259,14 +259,13 @@ def set_custom_style():
                 flex-direction: column;
                 height: calc(100vh - 200px);
                 margin-bottom: 20px;
-                position: relative;
             }
 
             .messages-container {
                 flex-grow: 1;
                 overflow-y: auto;
                 padding: 20px;
-                margin-bottom: 80px;
+                margin-bottom: 20px;
             }
 
             .input-container {
@@ -279,22 +278,8 @@ def set_custom_style():
                 backdrop-filter: blur(10px);
                 border-top: 1px solid rgba(255, 255, 255, 0.1);
                 z-index: 1000;
-                width: 100%;
-                max-width: 100%;
             }
-
-            /* 채팅 입력창 위치 고정 */
-            .stChatInputContainer {
-                position: fixed !important;
-                bottom: 0 !important;
-                left: 0 !important;
-                right: 0 !important;
-                padding: 1rem !important;
-                background: rgba(26, 27, 30, 0.95) !important;
-                backdrop-filter: blur(10px) !important;
-                z-index: 1000 !important;
-            }
-
+            
             /* Streamlit 기본 헤더 완전히 제거 */
             .stAppHeader,
             header[data-testid="stHeader"],
@@ -463,111 +448,6 @@ def set_custom_style():
                 box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25),
                             0 4px 10px rgba(0, 0, 0, 0.15),
                             0 2px 4px rgba(0, 0, 0, 0.1);
-            }
-
-            /* st-emotion-cache 클래스 추가 */
-            .st-emotion-cache-1wmy9hl {
-                background: transparent !important;
-            }
-
-            /* 모든 Streamlit emotion-cache 클래스 스타일 오버라이드 */
-            div[class*="st-emotion-cache-"] {
-                background: transparent !important;
-            }
-
-            /* 특정 emotion-cache 클래스들 명시적 오버라이드 */
-            .st-emotion-cache-1wmy9hl,
-            .st-emotion-cache-1v0mbdj,
-            .st-emotion-cache-16idsys,
-            .st-emotion-cache-10trblm,
-            .st-emotion-cache-1kyxreq,
-            .st-emotion-cache-1wbqy5l,
-            .st-emotion-cache-18ni7ap,
-            .st-emotion-cache-6qob1r,
-            .st-emotion-cache-1jicfl2,
-            .st-emotion-cache-bm2z3a {
-                background: transparent !important;
-            }
-
-            /* 채팅 메시지 컨테이너 스타일 유지 */
-            .stChatMessage {
-                background: rgba(45, 45, 45, 0.95) !important;
-            }
-
-            /* AI 메시지 스타일 유지 */
-            .stChatMessage[data-testid="assistant"] {
-                background: rgba(255, 87, 34, 0.95) !important;
-            }
-
-            /* 사용자 메시지 스타일 유지 */
-            .stChatMessage[data-testid="user"] {
-                background: rgba(45, 45, 45, 0.95) !important;
-            }
-
-            /* 모든 Streamlit emotion-cache 클래스 스타일 오버라이드 */
-            div[class*="st-emotion-cache-"] {
-                background: transparent !important;
-            }
-
-            /* 채팅 메시지 기본 스타일 */
-            .stChatMessage {
-                background: rgba(45, 45, 45, 0.95) !important;  /* 어두운 회색 배경 */
-                border: 1px solid rgba(255, 255, 255, 0.1);
-                border-radius: 8px;
-                padding: 1.2rem !important;
-                margin: 1.2rem 0 !important;
-                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2),
-                            0 2px 8px rgba(0, 0, 0, 0.1),
-                            0 1px 3px rgba(0, 0, 0, 0.05);
-            }
-
-            /* AI 메시지 스타일 */
-            .stChatMessage[data-testid="assistant"] {
-                background: rgba(255, 87, 34, 0.95) !important;  /* 오렌지색 배경 */
-                box-shadow: 0 8px 24px rgba(255, 87, 34, 0.15),
-                            0 2px 8px rgba(255, 87, 34, 0.1),
-                            0 1px 3px rgba(255, 87, 34, 0.05);
-            }
-
-            /* 사용자 메시지 스타일 */
-            .stChatMessage[data-testid="user"] {
-                background: rgba(45, 45, 45, 0.95) !important;  /* 어두운 회색 배경 */
-                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2),
-                            0 2px 8px rgba(0, 0, 0, 0.1),
-                            0 1px 3px rgba(0, 0, 0, 0.05);
-            }
-
-            /* 호버 효과 */
-            .stChatMessage:hover {
-                transform: translateY(-2px);
-                transition: all 0.3s ease;
-            }
-
-            .stChatMessage[data-testid="assistant"]:hover {
-                background: rgba(255, 87, 34, 0.85) !important;
-                box-shadow: 0 12px 28px rgba(255, 87, 34, 0.2),
-                            0 4px 10px rgba(255, 87, 34, 0.15),
-                            0 2px 4px rgba(255, 87, 34, 0.1);
-            }
-
-            .stChatMessage[data-testid="user"]:hover {
-                background: rgba(50, 50, 50, 0.95) !important;
-                box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25),
-                            0 4px 10px rgba(0, 0, 0, 0.15),
-                            0 2px 4px rgba(0, 0, 0, 0.1);
-            }
-
-            /* 채팅 메시지 내부 텍스트 스타일 */
-            .stChatMessage[data-testid="assistant"] p, 
-            .stChatMessage[data-testid="assistant"] span, 
-            .stChatMessage[data-testid="assistant"] div {
-                color: rgba(255, 255, 255, 0.9) !important;
-            }
-
-            .stChatMessage[data-testid="user"] p, 
-            .stChatMessage[data-testid="user"] span, 
-            .stChatMessage[data-testid="user"] div {
-                color: rgba(255, 255, 255, 0.9) !important;
             }
 
             </style>
@@ -848,14 +728,14 @@ class SF49StudioAssistant:
                         "⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯",
                         "⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯",
                         "⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯",
-                        "⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯",
-                        "⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯",
+                        "⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯",
+                        "⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯",
                         "⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯",
                         "⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯",
-                        "⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯",
+                        "⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯",
                         "⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯",
                         "⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯",
-                        "⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯",
+                        "⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯⋯",
                         "⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯⋯",
                         "⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯",
                         "⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯",
