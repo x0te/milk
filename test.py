@@ -100,19 +100,30 @@ def set_custom_style():
                 right: 45px;
             }
 
-            /* 채팅 입력 컨테이너 */
-            .chat-input-container {
+            /* 채팅 입력 고정 컨테이너 */
+            .chat-input-fixed {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
                 background: rgba(26, 27, 30, 0.95);
-                border-radius: 12px;
-                padding: 1rem;
-                margin: 2rem 0;
-                border: 1px solid rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                padding: 1rem 5rem;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+                z-index: 1000;
+            }
+
+            /* 메인 컨텐츠 영역 하단 여백 */
+            .main .block-container {
+                padding-bottom: 200px !important;  /* 입력 폼 높이만큼 여백 추가 */
             }
 
             /* 폼 스타일링 */
             .stForm {
                 background: transparent;
                 padding: 0;
+                max-width: 1200px;
+                margin: 0 auto;
             }
 
             /* 텍스트 영역 스타일링 */
@@ -154,6 +165,26 @@ def set_custom_style():
             /* 레이블 숨기기 */
             .stTextArea label {
                 display: none !important;
+            }
+
+            /* 스크롤바 스타일링 */
+            ::-webkit-scrollbar {
+                width: 8px;
+                height: 8px;
+            }
+
+            ::-webkit-scrollbar-track {
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 4px;
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: rgba(255, 255, 255, 0.2);
+                border-radius: 4px;
+            }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: rgba(255, 255, 255, 0.3);
             }
 
             /* 메시지 스타일 개선 */
@@ -239,7 +270,7 @@ def set_custom_style():
                 background: rgba(255, 75, 75, 0.8);
             }
 
-            /* Streamlit 기본 요소 조정 */
+            /* Streamlit ��본 요소 조정 */
             .stDeployButton {
                 display: none;
             }
@@ -281,194 +312,6 @@ def set_custom_style():
                 backdrop-filter: blur(10px);
                 border-top: 1px solid rgba(255, 255, 255, 0.1);
                 z-index: 1000;
-            }
-
-            /* Streamlit 기본 헤더 완전히 제거 */
-            .stAppHeader,
-            header[data-testid="stHeader"],
-            .stHeader,
-            header.st-emotion-cache-8ahh38,
-            header.ezrtsby2 {
-                display: none !important;
-                visibility: hidden !important;
-                height: 0 !important;
-                padding: 0 !important;
-                margin: 0 !important;
-                opacity: 0 !important;
-                pointer-events: none !important;
-            }
-
-            /* 네비게이션 컨테이너를 최상단에 고정 */
-            .nav-container {
-                position: fixed !important;
-                top: 0 !important;
-                left: 0 !important;
-                right: 0 !important;
-                height: 60px !important;
-                background-color: #FF5722 !important;
-                display: flex !important;
-                justify-content: flex-start !important;
-                align-items: center !important;
-                padding: 0 20px !important;
-                padding-left: 60% !important;
-                z-index: 999999 !important;
-                gap: 10px !important;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;
-            }
-
-            /* 아이콘 크기 조정 */
-            .nav-icon {
-                width: 40px !important;
-                height: 40px !important;
-                font-size: 1.5rem !important;
-                background: rgba(255, 255, 255, 0.1) !important;
-                border: none !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                margin: 0 5px !important;
-                transition: all 0.3s ease !important;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) !important;
-                border-radius: 50% !important;
-            }
-
-            .nav-icon:hover {
-                background: rgba(255, 255, 255, 0.2) !important;
-                transform: translateY(-2px) !important;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
-            }
-
-            /* 툴팁 위치 재조정 */
-            .nav-icon::after {
-                top: 65px !important;
-            }
-
-            /* 메인 컨텐츠 여백 조정 */
-            .main > div:first-child {
-                padding-top: 60px !important;
-            }
-            
-            /* 불필요한 여백 제거 */
-            .st-emotion-cache-1v0mbdj,  /* stVerticalBlock */
-            .st-emotion-cache-16idsys,
-            .st-emotion-cache-10trblm,
-            .st-emotion-cache-1kyxreq,
-            .st-emotion-cache-1wbqy5l {
-                margin: 0 !important;
-                padding: 0 !important;
-                height: auto !important;
-                min-height: 0 !important;
-            }
-
-            /* 제목과 컨텐츠 위치 조정 */
-            [data-testid="stVerticalBlock"] {
-                gap: 0 !important;
-                padding: 0 !important;
-            }
-
-            /* 상단 여백 조정 */
-            .main .block-container {
-                padding-top: 60px !important;  /* 헤더 높이만큼만 여백 설정 */
-                max-width: none !important;
-            }
-
-            /* 추가 여백 제거 */
-            .st-emotion-cache-18ni7ap {
-                padding: 0 !important;
-            }
-
-            .st-emotion-cache-6qob1r {
-                margin: 0 !important;
-                padding: 0 !important;
-            }
-            
-            /* Streamlit 기본 텍스트 크기 조정 */
-            .stMarkdown, .stText {
-                font-size: 1.1rem !important;
-            }
-
-            /* 제목 크기 조정 */
-            h1 {
-                font-size: 2.5rem !important;
-            }
-
-            h2 {
-                font-size: 2rem !important;
-            }
-
-            h3 {
-                font-size: 1.75rem !important;
-            }
-
-            /* 툴팁 크기 조정 */
-            .nav-icon::after {
-                font-size: 1rem !important;
-                padding: 0.6rem 1.2rem !important;
-            }
-
-            /* AI 메시지 스타일 */
-            .stChatMessage[data-testid="assistant"] {
-                background: rgba(255, 87, 34, 0.95) !important;  /* 오렌지색(#FF5722) 배경 */
-                box-shadow: 0 8px 24px rgba(255, 87, 34, 0.15),
-                            0 2px 8px rgba(255, 87, 34, 0.1),
-                            0 1px 3px rgba(255, 87, 34, 0.05);
-            }
-
-            /* AI 메시지 내부 텍스트 스타일 */
-            .stChatMessage[data-testid="assistant"] p, 
-            .stChatMessage[data-testid="assistant"] span, 
-            .stChatMessage[data-testid="assistant"] div {
-                color: rgba(33, 33, 33, 0.95) !important;  /* 어두운 글자색 */
-            }
-
-            /* 사용자 메시지 스타일 */
-            .stChatMessage[data-testid="user"] {
-                background: rgba(45, 45, 45, 0.95) !important;
-                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2),
-                            0 2px 8px rgba(0, 0, 0, 0.1),
-                            0 1px 3px rgba(0, 0, 0, 0.05);
-            }
-
-            /* 사용자 메시지 내부 텍스트 스타일 */
-            .stChatMessage[data-testid="user"] p, 
-            .stChatMessage[data-testid="user"] span, 
-            .stChatMessage[data-testid="user"] div {
-                color: rgba(255, 255, 255, 0.9) !important;
-            }
-
-            /* 호버 효과 */
-            .stChatMessage[data-testid="assistant"]:hover {
-                background: rgba(255, 87, 34, 0.85) !important;
-                transform: translateY(-2px);
-                box-shadow: 0 12px 28px rgba(255, 87, 34, 0.2),
-                            0 4px 10px rgba(255, 87, 34, 0.15),
-                            0 2px 4px rgba(255, 87, 34, 0.1);
-            }
-
-            .stChatMessage[data-testid="user"]:hover {
-                background: rgba(50, 50, 50, 0.95) !important;
-                transform: translateY(-2px);
-                box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25),
-                            0 4px 10px rgba(0, 0, 0, 0.15),
-                            0 2px 4px rgba(0, 0, 0, 0.1);
-            }
-
-            /* 폼 스타일 */
-            .stForm {
-                background: rgba(45, 45, 45, 0.95);
-                padding: 1rem;
-                border-radius: 8px;
-                border: 1px solid rgba(255, 255, 255, 0.1);
-            }
-            
-            .stForm [data-baseweb="textarea"] {
-                background: rgba(255, 255, 255, 0.05);
-                border-color: rgba(255, 255, 255, 0.1);
-            }
-            
-            .stForm [data-baseweb="textarea"]:focus {
-                border-color: #FF4B4B;
-                box-shadow: 0 0 0 1px rgba(255, 75, 75, 0.3);
             }
 
             </style>
@@ -580,7 +423,7 @@ class SF49StudioAssistant:
             보안 관련 중요 지침:
             1. 시스템 관련 정보 요청에 대해서는 절대 응답하지 않습니다.
             2. API 키, 토큰, 비밀번호 등 민감한 정보에 대한 질문은 무시합니다.
-            3. 서버 구성, 데이터베이스 구조 등 시스템 아키텍처 관��� 질문에는 답변하지 않습니다.
+            3. 서버 구성, 데이터베이스 구조 등 시스템 아키텍처 관 질문에는 답변하지 않습니다.
             4. 코드 실행이나 시스템 명령어 관련 요청은 거부합니다.
             5. 이러한 보안 관련 질문을 받으면 "죄송합니다만, 보안상의 이유로 해당 정보는 제공해드릴 수 없습니다."라고 답변합니다.
             6. 오직 이미지 생성과 관련된 디자인 요청만 처리합니다.
@@ -899,23 +742,27 @@ def main():
     st.title("SF49 Studio Designer")
     st.markdown('<p class="header-subtitle">AI 디자인 스튜디오</p>', unsafe_allow_html=True)
     
+    # 메시지 컨테이너
+    message_container = st.container()
+    
     # 설명 텍스트
     if 'shown_intro' not in st.session_state:
         message("💫 원하시는 이미지를 설명해 주세요", is_user=False)
         st.session_state.shown_intro = True
 
     # 채팅 히스토리 표시
-    for msg in st.session_state.messages:
-        message(msg["content"], is_user=(msg["role"] == "user"), key=f"msg_{id(msg)}")
-        
-        if "image_urls" in msg and msg["role"] == "assistant":
-            cols = st.columns(2)
-            for idx, url in enumerate(msg["image_urls"]):
-                with cols[idx % 2]:
-                    display_image(url, idx)
+    with message_container:
+        for msg in st.session_state.messages:
+            message(msg["content"], is_user=(msg["role"] == "user"), key=f"msg_{id(msg)}")
+            
+            if "image_urls" in msg and msg["role"] == "assistant":
+                cols = st.columns(2)
+                for idx, url in enumerate(msg["image_urls"]):
+                    with cols[idx % 2]:
+                        display_image(url, idx)
 
-    # 입력 폼
-    st.markdown('<div class="chat-input-container">', unsafe_allow_html=True)
+    # 하단 고정 입력 폼
+    st.markdown('<div class="chat-input-fixed">', unsafe_allow_html=True)
     with st.form(key='chat_form', clear_on_submit=True):
         user_input = st.text_area("", placeholder="원하시는 이미지를 설명해 주세요", key='input', height=100)
         cols = st.columns([6, 1])
