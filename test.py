@@ -101,34 +101,26 @@ def set_custom_style():
             
             /* 채팅 인터페이스 */
             .stChatMessage {
-                background: rgba(45, 45, 45, 0.95) !important;  /* 어두운 회색 배경 */
+                background: rgba(45, 45, 45, 0.95) !important;  /* 어두운 배경색 */
                 border: 1px solid rgba(255, 255, 255, 0.1);
-                border-radius: 8px;
-                padding: 1.2rem !important;
-                margin: 1.2rem 0 !important;
-                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2),   /* 외부 그림자 */
-                            0 2px 8px rgba(0, 0, 0, 0.1),     /* 중간 그림자 */
-                            0 1px 3px rgba(0, 0, 0, 0.05);    /* 미세 그림자 */
-                font-size: 1.1rem !important;
-                color: rgba(255, 255, 255, 0.9) !important;
-                transform: translateY(0);                      /* 애니메이션 시작 위치 */
-                transition: all 0.3s ease;                    /* 부드러운 전환 효과 */
+                border-radius: 12px;  /* 모서리 더 둥글게 */
+                padding: 1.5rem !important;
+                margin: 1.5rem 0 !important;
+                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
             }
 
             .stChatMessage:hover {
-                border-color: rgba(255, 75, 75, 0.2);
-                background: rgba(50, 50, 50, 0.95) !important;
-                box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25),  /* 호버 시 그림자 강화 */
-                            0 4px 10px rgba(0, 0, 0, 0.15),
-                            0 2px 4px rgba(0, 0, 0, 0.1);
-                transform: translateY(-2px);                   /* 호버 시 살짝 위로 떠오르는 효과 */
+                transform: translateY(-2px);
+                transition: all 0.3s ease;
             }
 
             /* 채팅 메시지 내부의 모든 텍스트 요소에 대한 색상 지정 */
             .stChatMessage p, 
             .stChatMessage span, 
             .stChatMessage div {
-                color: rgba(255, 255, 255, 0.9) !important;  /* 하얀색 글씨 */
+                color: rgba(255, 255, 255, 0.9) !important;
+                font-size: 1.1rem !important;
+                line-height: 1.6 !important;
             }
 
             /* 입력 필드 */
@@ -406,9 +398,7 @@ def set_custom_style():
             /* AI 메시지 스타일 */
             .stChatMessage[data-testid="assistant"] {
                 background: rgba(255, 87, 34, 0.95) !important;  /* 오렌지색(#FF5722) 배경 */
-                box-shadow: 0 8px 24px rgba(255, 87, 34, 0.15),
-                            0 2px 8px rgba(255, 87, 34, 0.1),
-                            0 1px 3px rgba(255, 87, 34, 0.05);
+                box-shadow: 0 8px 24px rgba(255, 87, 34, 0.15);
             }
 
             /* AI 메시지 내부 텍스트 스타일 */
@@ -448,6 +438,11 @@ def set_custom_style():
                 box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25),
                             0 4px 10px rgba(0, 0, 0, 0.15),
                             0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+
+            /* 메시지 내부 아이콘 제거 */
+            .stChatMessage .stMarkdown > div:first-child {
+                display: none !important;
             }
 
             </style>
