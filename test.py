@@ -525,7 +525,7 @@ def confetti_effect():
     """, unsafe_allow_html=True)
 
 def fireworks_effect():
-    """스트림릿에서 불꽃놀이 효과를 표시"""
+    """스트림릿��서 불꽃놀이 효과를 표시"""
     st.markdown("""
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
     <script>
