@@ -106,14 +106,22 @@ def set_custom_style():
                 border-radius: 8px;
                 padding: 1.2rem !important;
                 margin: 1.2rem 0 !important;
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2),   /* 외부 그림자 */
+                            0 2px 8px rgba(0, 0, 0, 0.1),     /* 중간 그림자 */
+                            0 1px 3px rgba(0, 0, 0, 0.05);    /* 미세 그림자 */
                 font-size: 1.1rem !important;
-                color: rgba(255, 255, 255, 0.9) !important;  /* 하얀색 글씨 */
+                color: rgba(255, 255, 255, 0.9) !important;
+                transform: translateY(0);                      /* 애니메이션 시작 위치 */
+                transition: all 0.3s ease;                    /* 부드러운 전환 효과 */
             }
 
             .stChatMessage:hover {
                 border-color: rgba(255, 75, 75, 0.2);
-                background: rgba(50, 50, 50, 0.95) !important;  /* 호버 시 약간 밝은 회색 */
+                background: rgba(50, 50, 50, 0.95) !important;
+                box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25),  /* 호버 시 그림자 강화 */
+                            0 4px 10px rgba(0, 0, 0, 0.15),
+                            0 2px 4px rgba(0, 0, 0, 0.1);
+                transform: translateY(-2px);                   /* 호버 시 살짝 위로 떠오르는 효과 */
             }
 
             /* 채팅 메시지 내부의 모든 텍스트 요소에 대한 색상 지정 */
@@ -171,12 +179,14 @@ def set_custom_style():
                 transition: all 0.3s ease;
                 position: relative;
                 box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+                width: 100%;
             }
             
             .image-container img {
                 width: 100%;
                 border-radius: 8px;
                 border: 1px solid rgba(255, 255, 255, 0.1);
+                display: block;
             }
             
             .image-container:hover {
@@ -671,8 +681,8 @@ class SF49StudioAssistant:
                         "⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯",
                         "⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯",
                         "⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯",
-                        "⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯",
-                        "⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯",
+                        "⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯",
+                        "⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯",
                         "⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯",
                         "⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯",
                         "⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯ 🐌 ⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯",
@@ -826,23 +836,21 @@ def main():
                     st.markdown(message["content"])
                     
                     if "image_urls" in message:
-                        cols = st.columns(2)
                         for idx, url in enumerate(message["image_urls"]):
-                            with cols[idx % 2]:
-                                buffer = io.BytesIO()
-                                img = Image.open(requests.get(url, stream=True).raw)
-                                img.save(buffer, format="PNG")
-                                img_base64 = base64.b64encode(buffer.getvalue()).decode()
-                                st.markdown(f"""
-                                    <div class="image-container">
-                                        <img src="{url}">
-                                        <div class="overlay-buttons">
-                                            <a href="data:image/png;base64,{img_base64}" download="Design_Option_{idx + 1}.png" class="overlay-button" title="이미지 다운로드">💾</a>
-                                            <a href="{url}" target="_blank" class="overlay-button" title="크게 보기">🔍</a>
-                                        </div>
-                                        <p class="image-caption">Design Option {idx + 1}</p>
+                            buffer = io.BytesIO()
+                            img = Image.open(requests.get(url, stream=True).raw)
+                            img.save(buffer, format="PNG")
+                            img_base64 = base64.b64encode(buffer.getvalue()).decode()
+                            st.markdown(f"""
+                                <div class="image-container">
+                                    <img src="{url}">
+                                    <div class="overlay-buttons">
+                                        <a href="data:image/png;base64,{img_base64}" download="Design_Option_{idx + 1}.png" class="overlay-button" title="이미지 다운로드">💾</a>
+                                        <a href="{url}" target="_blank" class="overlay-button" title="크게 보기">🔍</a>
                                     </div>
-                                """, unsafe_allow_html=True)
+                                    <p class="image-caption">Design Option {idx + 1}</p>
+                                </div>
+                            """, unsafe_allow_html=True)
 
         # 입력 영역
         with st.container():
