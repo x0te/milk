@@ -1,5 +1,6 @@
 streamlit
 streamlit-extras
+streamlit_chat
 openai
 requests
 uuid
